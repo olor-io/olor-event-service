@@ -1,0 +1,23 @@
+{
+  "name": "community-app-event-service",
+  "version": "0.0.0",
+  "description": "Backend API used to manage events and event related content for community-app.",
+  "main": "index.js",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/valdero/community-app-event-service.git"
+  },
+  "author": "Valentin Abramenkov, Mauri Karlin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/valdero/community-app-event-service/issues"
+  },
+  "homepage": "https://github.com/valdero/community-app-event-service#readme"
+}

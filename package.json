@@ -1,6 +1,6 @@
 {
   "name": "community-app-event-service",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Backend API used to manage events and event related content for community-app.",
   "main": "index.js",
   "directories": {

@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/valdero/community-app-event-service/issues"
   },
-  "homepage": "https://github.com/valdero/community-app-event-service#readme"
+  "homepage": "https://github.com/valdero/community-app-event-service#readme",
+  "dependencies": {
+    "mocha": "^3.2.0"
+  }
 }

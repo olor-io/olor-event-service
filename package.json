@@ -2,10 +2,11 @@
   "name": "community-app-event-service",
   "version": "0.1.0",
   "description": "Backend API used to manage events and event related content for community-app.",
-  "main": "index.js",
+  "main": "./src/index.js",
   "directories": {
     "example": "examples",
-    "test": "test"
+    "test": "test",
+    "src": "src"
   },
   "scripts": {
     "test": "make test"
@@ -21,6 +22,35 @@
   },
   "homepage": "https://github.com/valdero/community-app-event-service#readme",
   "dependencies": {
-    "mocha": "^3.2.0"
+    "bcrypt": "0.8.x",
+    "bluebird": "2.10.x",
+    "body-parser": "1.14.x",
+    "bookshelf": "0.8.x",
+    "change-case": "2.3.x",
+    "compression": "1.6.x",
+    "connect-redis": "3.0.x",
+    "cookie-parser": "1.4.x",
+    "cors": "2.7.x",
+    "csv-stringify": "0.0.8",
+    "errorhandler": "1.4.x",
+    "express": "4.13.x",
+    "express-graceful-exit": "0.1.x",
+    "express-session": "1.11.x",
+    "ioredis": "1.9.x",
+    "joi": "6.9.x",
+    "knex": "0.8.x",
+    "lodash": "3.10.x",
+    "moment": "2.10.x",
+    "morgan": "1.6.x",
+    "newrelic": "1.26.x",
+    "passport": "0.3.x",
+    "passport-local": "1.0.x",
+    "pg": "4.4.x",
+    "winston": "1.1.x"
+  },
+  "devDependencies": {
+    "chai": "^3.0.0",
+    "eslint": "^1.3.1",
+    "mocha": "^2.2.5"
   }
 }

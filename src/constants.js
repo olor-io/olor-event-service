@@ -1,14 +1,4 @@
 var CONST = {
-    // If these change, redis must be flushed
-    REDIS_PREFIX: {
-        RATING_SUMMARIES: 'rating-summaries'
-    },
-    DEFAULT_ITEM_LIMIT: 10,
-
-    HEADER_TOTAL_COUNT: 'x-total-count',
-
-    // It was a compromise to store the roles as constants instead of inside
-    // the database
 
     USER_ROLE_GROUPS: {
         ALL: ['admin', 'moderator', 'service'],
@@ -34,6 +24,10 @@ var CONST = {
         // Guest user
         ANONYMOUS: 'anonymous'
     },
+
+    USER_MIN_AGE: 16,
+
+    USER_MAX_AGE: 100,
 
     PASSWORD_HASH_SALT_LENGTH: 10,
 

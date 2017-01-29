@@ -6,12 +6,11 @@ var BaseModel = modelUtils.createBaseModel(bookshelf);
 var CONST = require('../constants');
 
 var schema = {
-    // Id, creation time and modification time are specified in base model on default
+    // Optional id, creation time and modification time are specified in base model on default
     userId: modelUtils.stringId().required(),
     firstName: Joi.string().min(1, 'utf8').max(50, 'utf8').required(),
     lastName: Joi.string().min(1, 'utf8').max(100, 'utf8').required(),
-    // Do we want to limit the age even at validation?
-    age: Joi.number().min(18).max(100).integer().required(),
+    age: Joi.number().min(CONST.USER_MIN_AGE).max(CONST.USER_MAX_AGE).integer().required(),
     bio: Joi.string().min(1, 'utf8').max(300, 'utf8').optional(),
     pictureUrl: Joi.string().uri({scheme: ['http', 'https']}).min(1).max(2000).optional(),
     eventDistanceArea: Joi.number().integer().required(),

@@ -9,12 +9,21 @@ var targetController = require('./controllers/target-controller');
 var settingController = require('./controllers/setting-controller');
 var authService = require('./services/auth-service');
 */
+
+var eventController = require('./controllers/event-controller');
 var CONST = require('./constants');
 
 // Note! Always use createRoute function to create new endpoints unless
 //       you are creating public routes
 function createRouter() {
     var router = express.Router();
+
+    createRoute(router, {
+      method: 'get',
+      url: '/events',
+      roles: CONST.USER_ROLE_GROUPS.ALL,
+      callback: eventController.getEvents
+    });
 
     // One route, /health is defined in app level
 

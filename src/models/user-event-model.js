@@ -12,7 +12,7 @@ var schema = {
 };
 
 var UserEvent = BaseModel.extend({
-    tableName: 'userevents',
+    tableName: 'user_events',
     schema: schema,
 
     initialize: function() {
@@ -20,11 +20,11 @@ var UserEvent = BaseModel.extend({
     },
 
     events: function() {
-        return this.hasMany('UserEvent');
+        return this.belongsTo('Event');
     },
 
     users: function() {
-        return this.hasMany('User');
+        return this.belongsTo('User');
     }
 });
 

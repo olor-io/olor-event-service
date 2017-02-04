@@ -8,7 +8,7 @@ var CONST = require('../constants');
 var schema = {
     // Id, creation time and modification time are specified in base model on default
     userId: modelUtils.bigInteger().required(),
-    eventId: modelUtils.bigInteger().required()
+    eventId: modelUtils.stringId().required()
 };
 
 var UserEvent = BaseModel.extend({

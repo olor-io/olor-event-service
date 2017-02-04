@@ -20,14 +20,11 @@ var databaseConfig = {
             conn.query('SELECT 1', cb);
         }
     },
-    debug: process.env.DEBUG_DATABASE === 'true'
-    /*
-    Enable when implementing migrations with knex
-    ,migrations: {
+    debug: process.env.DEBUG_DATABASE === 'true',
+    migrations: {
         directory: path.join(__dirname, '../migrations'),
         tableName: 'migrations'
     }
-    */
 };
 
 var knex = null;

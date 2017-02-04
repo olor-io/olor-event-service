@@ -17,7 +17,7 @@ var compression = require('compression');
 var gracefulExit = require('express-graceful-exit');
 var logger = require('./logger')(__filename);
 var Database = require('./database');
-var Redis = require('./redis');
+//var Redis = require('./redis');
 var createRouter = require('./routes');
 //var scheduler = require('./scheduler');
 
@@ -35,9 +35,11 @@ function startApp() {
     }
 
     var db = Database.connect();
+    /*
     var redis = process.env.DISABLE_REDIS !== 'true'
                 ? Redis.connect()
                 : null;
+    */
     var app = express();
 
     // Requests go through load balancer and req.ip is not correct if we don't
@@ -147,11 +149,12 @@ function startApp() {
 
     app.use(cookieParser());
     app.use(bodyParser.json());
+/*
     app.use(compression({
         // Compress everything over 10 bytes
         threshold: 10
     }));
-
+*/
     // https://github.com/mathrawka/express-graceful-exit
     app.use(gracefulExit.middleware(app));
 
@@ -266,17 +269,18 @@ function startApp() {
     server.on('close', function() {
         logger.info('Received "close" event for http.Server');
         db.close();
-
+        /*
         if (redis !== null) {
             redis.close();
         }
+        */
     });
 
     return {
         app: app,
         server: server,
-        db: db,
-        redis: redis
+        db: db//,
+        //redis: redis
     };
 }
 

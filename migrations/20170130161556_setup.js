@@ -1,9 +1,17 @@
 
 exports.up = function(knex, Promise) {
-  return knex.schema.createTable('events', function(table) {
+    // Index columns are sortable in the API
 
-        // Index columns are sortable in the API
-        table.bigIncrements('id').primary().index();
+    return knex.schema
+    .createTableIfNotExists('user_events', function(table) {
+        // Create user_events table
+        table.increments('id').primary().index();
+        table.integer('user_id').notNullable().index();
+        table.integer('event_id').notNullable().index();
+    })
+    .createTableIfNotExists('events', function(table) {
+        // Create table events
+        table.increments('id').primary().index();
         table.string('name').notNullable().index();
         table.string('description').notNullable().index();
         table.dateTime('start_time').notNullable();
@@ -18,13 +26,15 @@ exports.up = function(knex, Promise) {
         table.integer('category_id').notNullable().index();
         table.timestamp('created_at').index();
         table.timestamp('updated_at').index();
-
-        // Foreign keys
-        table.foreign('creator_id').references('user_events.user_id');
-        table.foreign('admin_id').references('user_events.user_id');
+    })
+    .table('user_events', function(table) {
+        // Add event_id foreign key after both tables are created
+        table.foreign('event_id').references('id').inTable('events').onDelete('cascade');
     });
 };
 
 exports.down = function(knex, Promise) {
-  return knex.schema.dropTable('events');
+    return knex.schema
+    .dropTableIfExists('user_events')
+    .dropTableIfExists('events');
 };

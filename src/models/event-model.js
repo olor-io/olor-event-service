@@ -11,13 +11,13 @@ var schema = {
     description: Joi.string().min(1, 'utf8').max(2000, 'utf8').optional(),
     startTime: Joi.date().iso().required(),
     duration: Joi.number().integer().required(),
-    maxParticipantAmount: Joi.number().integer().required(),
-    currentParticipantAmount: Joi.number().integer().required(),
+    maxParticipants: Joi.number().integer().required(),
+    curParticipants: Joi.number().integer().required(),
     coordinates: modelUtils.schema.stringId().required(),
     creatorId: modelUtils.schema.stringId().required(),
-    adminId: modelUtils.schema.stringId().required()
-    reviewDeadLineTime: Joi.date().iso().required(),
-    eventChatId: Joi.number().integer().required(),
+    adminId: modelUtils.schema.stringId().required(),
+    reviewDeadline: Joi.date().iso().required(),
+    chatId: Joi.number().integer().required(),
     categoryId: Joi.number().integer().required()
 };
 

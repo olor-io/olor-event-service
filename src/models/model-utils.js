@@ -30,10 +30,11 @@ function objectKeysToCase(obj, toCase) {
     var func = toCase === 'camel' ? changeCase.camelCase : changeCase.snakeCase;
 
     return _.reduce(obj, function(memo, val, key) {
-        if (_.isPlainObject(val))
+        if (_.isPlainObject(val)) {
             memo[func(key)] = objectKeysToCase(val, toCase);
-        else
+        } else {
             memo[func(key)] = val;
+        }
 
         return memo;
     }, {});
@@ -50,8 +51,9 @@ function createBaseModel(bookshelf) {
         hasTimestamps: ['createdAt', 'updatedAt'],
 
         initialize: function() {
-            if (!this.schema)
+            if (!this.schema) {
                 throw new Error('You should define a schema for your model.');
+            }
 
             this.schema = Joi.object(this.schema).keys(BASE_SCHEMA);
             this.on('saving', this.validateSave);
@@ -72,11 +74,13 @@ function createBaseModel(bookshelf) {
 
             // snake_case db columns -> camelCase attributes
             var attrs = objectKeysToCase(response, 'camel');
-            if (attrs.createdAt)
+            if (attrs.createdAt) {
                 attrs.createdAt = moment(attrs.createdAt);
+            }
 
-            if (attrs.updatedAt)
+            if (attrs.updatedAt) {
                 attrs.updatedAt = moment(attrs.updatedAt);
+            }
 
             return attrs;
         },

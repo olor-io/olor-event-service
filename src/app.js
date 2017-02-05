@@ -149,12 +149,12 @@ function startApp() {
 
     app.use(cookieParser());
     app.use(bodyParser.json());
-/*
+    /*
     app.use(compression({
         // Compress everything over 10 bytes
         threshold: 10
     }));
-*/
+    */
     // https://github.com/mathrawka/express-graceful-exit
     app.use(gracefulExit.middleware(app));
 
@@ -173,7 +173,7 @@ function startApp() {
         next(err, req, res, next);
     });
 
-  /*
+    /*
     if (process.env.NODE_ENV === 'test') {
         app.use(function(err, req, res, next) {
             // Log all internal server errors anyway
@@ -186,7 +186,7 @@ function startApp() {
             next(err);
         });
     }
-  */
+    */
 
     if (process.env.NODE_ENV !== 'test') {
         app.use(function errorLogger(err, req, res, next) {
@@ -222,10 +222,11 @@ function startApp() {
             var status = err.status ? err.status : 500;
 
             var httpMessage = http.STATUS_CODES[status];
-            if (status < 500)
+            if (status < 500) {
                 message = httpMessage + ': ' + err.message;
-            else
+            } else {
                 message = httpMessage;
+            }
 
             res.status(status);
             res.send({ error: message });

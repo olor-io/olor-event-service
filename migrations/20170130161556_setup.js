@@ -8,24 +8,26 @@ exports.up = function(knex, Promise) {
         table.increments('id').primary().index();
         table.integer('user_id').notNullable().index();
         table.integer('event_id').notNullable().index();
+        table.timestamp('created_at');
+        table.timestamp('updated_at');
     })
     .createTableIfNotExists('events', function(table) {
         // Create table events
         table.increments('id').primary().index();
         table.string('name').notNullable().index();
-        table.string('description').notNullable().index();
+        table.string('description').notNullable();
         table.dateTime('start_time').notNullable();
         table.integer('duration');
-        table.integer('max_participant_amount').notNullable();
-        table.integer('current_participant_amount').notNullable();
+        table.integer('max_participants').notNullable();
+        table.integer('cur_participants').notNullable();
         table.string('coordinates').notNullable().index();
-        table.dateTime('review_deadline_time').notNullable();
+        table.dateTime('review_deadline').notNullable();
         table.string('creator_id').notNullable().index();
         table.string('admin_id').notNullable().index();
-        table.integer('event_chat_id').notNullable();
+        table.integer('chat_id').notNullable();
         table.integer('category_id').notNullable().index();
-        table.timestamp('created_at').index();
-        table.timestamp('updated_at').index();
+        table.timestamp('created_at');
+        table.timestamp('updated_at');
     })
     .table('user_events', function(table) {
         // Add event_id foreign key after both tables are created

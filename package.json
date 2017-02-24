@@ -9,7 +9,7 @@
     "src": "src"
   },
   "engines": {
-    "node": "0.12.x"
+    "node": "7.4.x"
   },
   "repository": {
     "type": "git",

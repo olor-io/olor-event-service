@@ -1,6 +1,6 @@
 #!/bin/bash
 
-heroku addons:create --app k-rating-prod papertrail
-heroku addons:create --app k-rating-prod heroku-postgresql
-heroku addons:create --app k-rating-prod newrelic
-heroku addons:create --app k-rating-prod heroku-redis
+heroku addons:create --app community-events papertrail
+heroku addons:create --app community-events heroku-postgresql
+heroku addons:create --app community-events newrelic
+heroku addons:create --app community-events heroku-redis

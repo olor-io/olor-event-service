@@ -1,7 +1,7 @@
 var express = require('express');
 var passport = require('passport');
 var eventController = require('./controllers/event-controller');
-var authService = require('./services/auth-service');
+//var authService = require('./services/auth-service');
 var CONST = require('./constants');
 
 // Always use createRoute function to create new endpoints
@@ -52,11 +52,11 @@ function createRouter() {
 function createRoute(router, opts) {
     var routeParams = [opts.url];
 
-    routeParams.push(authService.requireAuthenticated());
+    //routeParams.push(authService.requireAuthenticated());
 
     // Default: admin-only
     var roles = opts.roles ? opts.roles : [CONST.USER_ROLES.ADMIN];
-    routeParams.push(authService.requireRole(roles));
+    //routeParams.push(authService.requireRole(roles));
     routeParams.push(opts.callback);
     router[opts.method].apply(router, routeParams);
 }

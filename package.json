@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/valdero/community-app-event-service#readme",
   "dependencies": {
-    "bcrypt": "0.8.x",
+    "bcrypt": "^1.0.2",
     "bluebird": "3.4.x",
     "body-parser": "1.16.x",
     "bookshelf": "0.10.x",
@@ -35,7 +35,7 @@
     "knex": "0.12.x",
     "lodash": "4.17.x",
     "moment": "2.17.x",
-    "morgan": "1.7.x",
+    "morgan": "^1.8.0",
     "newrelic": "1.36.x",
     "passport": "0.3.x",
     "passport-local": "1.0.x",

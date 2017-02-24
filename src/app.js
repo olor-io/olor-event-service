@@ -17,7 +17,7 @@ var compression = require('compression');
 var gracefulExit = require('express-graceful-exit');
 var logger = require('./logger')(__filename);
 var Database = require('./database');
-//var Redis = require('./redis');
+var Redis = require('./redis');
 var createRouter = require('./routes');
 //var scheduler = require('./scheduler');
 
@@ -35,11 +35,9 @@ function startApp() {
     }
 
     var db = Database.connect();
-    /*
     var redis = process.env.DISABLE_REDIS !== 'true'
                 ? Redis.connect()
                 : null;
-    */
     var app = express();
 
     // Requests go through load balancer and req.ip is not correct if we don't
@@ -65,7 +63,6 @@ function startApp() {
         });
     }
 
-    /*
     if (process.env.NODE_ENV === 'production' &&
         process.env.LOG_REQUESTS === 'true') {
         // Log requests on production only if env variable is set
@@ -84,12 +81,13 @@ function startApp() {
         app.use(morgan('dev'));
 
         // Start running scheduled tasks
+        /*
         scheduler.start({
             initialRun: true,
             initialRunDelay: 3000
         });
+        */
     }
-    */
 
     // For API health monitoring
     // Specified before authentication so that new relic can ping it
@@ -111,7 +109,7 @@ function startApp() {
             });
         }
     );
-
+*/
 
     if (process.env.NODE_ENV === 'development' ||
         process.env.NODE_ENV === 'test') {
@@ -136,7 +134,7 @@ function startApp() {
         }
     }
 
-
+/*
     var corsOpts = {
         origin: process.env.CORS_ORIGIN,
         credentials: true,
@@ -145,8 +143,7 @@ function startApp() {
     };
     logger.info('Using CORS options:', corsOpts);
     app.use(cors(corsOpts));
-    */
-
+*/
     app.use(cookieParser());
     app.use(bodyParser.json());
     /*
@@ -173,7 +170,6 @@ function startApp() {
         next(err, req, res, next);
     });
 
-    /*
     if (process.env.NODE_ENV === 'test') {
         app.use(function(err, req, res, next) {
             // Log all internal server errors anyway
@@ -186,7 +182,6 @@ function startApp() {
             next(err);
         });
     }
-    */
 
     if (process.env.NODE_ENV !== 'test') {
         app.use(function errorLogger(err, req, res, next) {
@@ -270,18 +265,17 @@ function startApp() {
     server.on('close', function() {
         logger.info('Received "close" event for http.Server');
         db.close();
-        /*
         if (redis !== null) {
             redis.close();
         }
-        */
+
     });
 
     return {
         app: app,
         server: server,
-        db: db//,
-        //redis: redis
+        db: db,
+        redis: redis
     };
 }
 

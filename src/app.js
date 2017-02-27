@@ -268,7 +268,6 @@ function startApp() {
         if (redis !== null) {
             redis.close();
         }
-
     });
 
     return {

@@ -89,8 +89,8 @@ var USER_EVENTS_TABLE = UserEvent.prototype.tableName;
 
 // This method uses knex directly to improve performance:
 // See this issue: https://github.com/tgriesser/bookshelf/issues/774
-// that's why it contains so much extra validation.
 function getEvents(params, internalOpts) {
+
     // Opts for internal use: meaning that other services may use these options
     // to e.g. disable safety features
     internalOpts = _.merge({
@@ -98,70 +98,29 @@ function getEvents(params, internalOpts) {
         includeAllFields: false
     }, internalOpts);
 
-    // Validate parameters
     var opts = serviceUtils.pickAndValidateListOpts(params, ALLOWED_SORT_KEYS);
     var whereObj = serviceUtils.pickAndValidateWheres(
-        params,
-        PUBLIC_TO_MODEL,
-        ALLOWED_MULTI_SEARCH_KEYS
+        params, PUBLIC_TO_MODEL, ALLOWED_MULTI_SEARCH_KEYS
     );
-
-    serviceUtils.validateBoolean(params.hasComment, 'hasComment');
-    serviceUtils.validateBoolean(params.hasEvent, 'hasEvent');
-
-    var queryBuilder;
-    if (internalOpts.trx) {
-        queryBuilder = internalOpts.trx;
-    } else {
-        queryBuilder = knex;
-    }
 
     // Execute query
-    queryBuilder = queryBuilder.select([
-        'events.*',
-        'targets.external_id as target_id',
-        'targets.namespace as target_namespace',
-        'targets.category as category',
-        'targets.sub_category as sub_category',
-        'targets.name as name',
-        'targets.url as url'
-    ])
-    .from(EVENTS_TABLE)
-    .leftJoin(
-        TARGETS_TABLE + ' as ' + TARGETS_TABLE,
-        EVENTS_TABLE + '.target_id',
-        TARGETS_TABLE + '.id'
-    );
+    var queryBuilder;
+    queryBuilder = knex;
+    queryBuilder = queryBuilder.select().from(EVENTS_TABLE);
 
-    serviceUtils.addWheresToQuery(queryBuilder, whereObj, PUBLIC_TO_MODEL);
-    var whereNotObj = {};
-    if (params.hasComment) {
-        whereNotObj.comment = null;
-    }
-    if (params.hasEvent) {
-        whereNotObj.event = null;
-    }
-    serviceUtils.addWhereNotsToQuery(queryBuilder, whereNotObj);
-
-    var countQueryOpts = {trx: internalOpts.trx};
+    var countQueryOpts = { trx: internalOpts.trx };
     var countQuery = serviceUtils.countQuery(queryBuilder, countQueryOpts);
 
-    // We need to do limitations and offset calculations after building
-    // the countQuery
-    if (!internalOpts.disableLimit) {
-        queryBuilder = queryBuilder.limit(opts.limit);
-    }
-    queryBuilder = queryBuilder.offset(opts.offset);
+    // See later:
+    //  are limiting, wheres and offsets are needed for queries?
+
     serviceUtils.addSortsToQuery(queryBuilder, opts.sort, PUBLIC_TO_MODEL);
 
-    return countQuery.then(function(result) {
-        var totalCount = Number(result[0].count);
-
-        return queryBuilder.then(function(rows) {
+    return countQuery.then(function(res) {
+        var totalCount = Number(res[0].count);
+        return queryBuilder.then(fuction(rows) {
             var data = _.map(rows, function(row) {
-                // Disable omit when passing the object through event's parse
                 var publicEventObj = Event.prototype.parse(row);
-
                 return formatEventSafe(publicEventObj, internalOpts);
             });
 
@@ -174,29 +133,32 @@ function getEvents(params, internalOpts) {
 }
 
 // XXX: This method, like others besides getEvents do not care about the
-//      published status of events.
+//      published status of events. Is this needed?
 function getEvent(eventId, internalOpts) {
     validate(eventId, 'id', modelUtils.schema.bigInteger().required());
     internalOpts = _.merge({
         includeAllFields: false
     }, internalOpts);
 
-    return Event
+    return Event_
     .forge({id: eventId})
-    .fetch({withRelated: ['target']})
     .then(function(model) {
-        if (!model) {
+        if(!model) {
             var err = new Error('Event does not exist');
             err.status = 404;
             throw err;
         }
-
-        var publicEventObj = _privateToPublicEvent(model.toJSON());
-        return formatEventSafe(publicEventObj, internalOpts);
+        // Is public-private casting needed?
+        // var publicEventObj = _privateToPublicEvent(model.toJSON());
+        return formatEventSafe(model.toJSON(), internalOpts);
     });
 }
 
 function createEvent(eventObj, internalOpts) {
+
+
+
+    /*
     internalOpts = _.merge({
         includeAllFields: false
     }, internalOpts);
@@ -277,9 +239,11 @@ function createEvent(eventObj, internalOpts) {
 
         return formatEventSafe(publicEventObj, internalOpts);
     });
+    */
 }
 
 function updateEvent(eventId, updatedPublicEventObj, internalOpts) {
+    /*
     validate(eventId, 'id', modelUtils.schema.bigInteger().required());
     internalOpts = _.merge({
         includeAllFields: false
@@ -347,9 +311,11 @@ function updateEvent(eventId, updatedPublicEventObj, internalOpts) {
 
         return formatEventSafe(publicEventObj, internalOpts);
     });
+    */
 }
 
 function deleteEvent(eventId) {
+    /*
     validate(eventId, 'id', modelUtils.schema.bigInteger().required());
 
     return bookshelf.transaction(function(trx) {
@@ -376,13 +342,30 @@ function deleteEvent(eventId) {
             );
         });
     });
+    */
 }
 
+function formatEventSafe(publicEventObj, opts) {
+    opts = _.merge({
+        includeAllFields: false
+    }, opts);
+
+    if (opts.includeAllFields) {
+        return publicEventObj;
+    }
+
+    return omitModeratorFields(publicEventObj);
+}
+
+function omitModeratorFields(publicEventObj) {
+    return _.pick(publicEventObj, SERVICE_USER_KEYS);
+}
 
 module.exports = {
     getEvents: getEvents,
     getEvent: getEvent,
     createEvent: createEvent,
     updateEvent: updateEvent,
-    deleteEvent: deleteEvent
+    deleteEvent: deleteEvent,
+    omitModeratorFields: omitModeratorFields
 };

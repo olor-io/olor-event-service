@@ -24,6 +24,9 @@ var databaseConfig = {
     migrations: {
         directory: path.join(__dirname, '../migrations'),
         tableName: 'migrations'
+    },
+    seeds: {
+        directory: path.join(__dirname, '../tools/seeds')
     }
 };
 

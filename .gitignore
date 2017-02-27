@@ -52,3 +52,6 @@ jspm_packages
 
 # Tern project
 .tern-project
+
+# Redis
+dump.rdb

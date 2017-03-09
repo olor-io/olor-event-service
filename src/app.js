@@ -7,12 +7,12 @@ require('./setup-env-vars');
 
 var express = require('express');
 var http = require('http');
-var cors = require('cors');
+//var cors = require('cors');
 var errorhandler = require('errorhandler');
 var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
-var compression = require('compression');
+//var compression = require('compression');
 //var setupAuth = require('./setup-auth');
 var gracefulExit = require('express-graceful-exit');
 var logger = require('./logger')(__filename);
@@ -134,7 +134,7 @@ function startApp() {
         }
     }
 
-/*
+    /*
     var corsOpts = {
         origin: process.env.CORS_ORIGIN,
         credentials: true,
@@ -143,7 +143,8 @@ function startApp() {
     };
     logger.info('Using CORS options:', corsOpts);
     app.use(cors(corsOpts));
-*/
+    */
+
     app.use(cookieParser());
     app.use(bodyParser.json());
     /*

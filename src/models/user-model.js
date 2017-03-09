@@ -1,4 +1,3 @@
-var _ = require('lodash');
 var Joi = require('joi');
 var bookshelf = require('../database').connect().bookshelf;
 var modelUtils = require('./model-utils');

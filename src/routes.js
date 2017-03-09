@@ -1,8 +1,8 @@
 var express = require('express');
-var passport = require('passport');
 var eventController = require('./controllers/event-controller');
-//var authService = require('./services/auth-service');
 var CONST = require('./constants');
+//var passport = require('passport');
+//var authService = require('./services/auth-service');
 
 // Always use createRoute function to create new endpoints
 // unless you are creating public routes
@@ -16,19 +16,20 @@ function createRouter() {
         roles: CONST.USER_ROLE_GROUPS.ALL,
         callback: eventController.getEvents
     });
-    // Event
-    createRoute(router, {
-        method: 'post',
-        url: '/events',
-        roles: CONST.USER_ROLE_GROUPS.ALL,
-        callback: eventController.postEvent
-    });
 
+    // Event
     createRoute(router, {
         method: 'get',
         url: '/events/:id',
         roles: CONST.USER_ROLE_GROUPS.ALL,
         callback: eventController.getEvent
+    });
+
+    createRoute(router, {
+        method: 'post',
+        url: '/events',
+        roles: CONST.USER_ROLE_GROUPS.ALL,
+        callback: eventController.postEvent
     });
 
     createRoute(router, {
@@ -55,7 +56,7 @@ function createRoute(router, opts) {
     //routeParams.push(authService.requireAuthenticated());
 
     // Default: admin-only
-    var roles = opts.roles ? opts.roles : [CONST.USER_ROLES.ADMIN];
+    //var roles = opts.roles ? opts.roles : [CONST.USER_ROLES.ADMIN];
     //routeParams.push(authService.requireRole(roles));
     routeParams.push(opts.callback);
     router[opts.method].apply(router, routeParams);

@@ -1,9 +1,7 @@
-var _ = require('lodash');
 var Joi = require('joi');
 var bookshelf = require('../database').connect().bookshelf;
 var modelUtils = require('./model-utils');
 var BaseModel = modelUtils.createBaseModel(bookshelf);
-var CONST = require('../constants');
 
 var schema = {
     // Id, creation time and modification time are specified in base model on default
@@ -34,4 +32,4 @@ var Event_ = BaseModel.extend({
     }
 });
 
-module.exports = bookshelf.model('Event', Event_);
+module.exports = bookshelf.model('Event_', Event_);

@@ -1,5 +1,4 @@
 // Service to handle all operations related to events
-// The API exposes only the concept of an event, to make the API usage easier
 
 var CONST = require('../constants');
 var Event_ = require('../models/event-model');
@@ -101,9 +100,11 @@ function getEvents(params, internalOpts) {
     }, internalOpts);
 
     var opts = serviceUtils.pickAndValidateListOpts(params, ALLOWED_SORT_KEYS);
+    /*
     var whereObj = serviceUtils.pickAndValidateWheres(
         params, PUBLIC_TO_MODEL, ALLOWED_MULTI_SEARCH_KEYS
     );
+    */
 
     // Execute query
     var queryBuilder;
@@ -157,179 +158,22 @@ function getEvent(eventId, internalOpts) {
     });
 }
 
-function createEvent(eventObj, internalOpts) {
-    return undefined;
-
-    /*
-    internalOpts = _.merge({
-        includeAllFields: false
-    }, internalOpts);
-
-    var newTargetObj = _publicToPrivateTarget(eventObj);
-    var newEventObj = _publicToPrivateEvent(eventObj);
-
-    // XXX: If you forget to pass transaction to all individual database
-    //      queries inside the transaction, the query might end up to a
-    //      dead lock.
-    return bookshelf.transaction(function(trx) {
-        return targetService.createOrUpdateTarget(newTargetObj, {transacting: trx})
-        .then(function(targetModel) {
-            // XXX: This fetch is doing unnecessary work if the new event
-            //      doesn't have a numeric event
-            return Promise.props({
-                targetModel: targetModel,
-                err: _throwIfTooManyNumericEvents(
-                    newTargetObj.externalId,
-                    eventObj.authorId,
-                    newEventObj.event,
-                    {trx: trx}
-                ),
-                settings: settingService.getSetting(CONST.GLOBAL_SETTINGS_KEY, {
-                    transacting: trx
-                })
-            });
-        })
-        .then(function(result) {
-            var targetModel = result.targetModel;
-
-            // Link target to the model
-            newEventObj.targetId = targetModel.id;
-
-            // These defaults are also set at db level, but if they are
-            // not explicitly set at app level, knex/bookshelf tries to
-            // insert null values to db
-            newEventObj.reportCount = 0;
-
-            // Note: only users above service role can even set these parameters
-            //       that is handled at controller level.
-
-            var settings = result.settings;
-            var defaultPublished = settings.publishAutomatically;
-            var published = newEventObj.published;
-            newEventObj.published = _.isUndefined(published)
-                ? defaultPublished
-                : published;
-
-            var defaultModerated = settings.publishAutomatically;
-            var moderated = newEventObj.moderated;
-            newEventObj.moderated = _.isUndefined(moderated)
-                ? defaultModerated
-                : moderated;
-
-            var replyRequested = newEventObj.replyRequested;
-            newEventObj.replyRequested = _.isUndefined(replyRequested)
-                ? false
-                : replyRequested;
-
-            var newEvent = new Event(newEventObj);
-            return Promise.props({
-                targetModel: targetModel,
-                eventModel: newEvent.save(null, {transacting: trx})
-            })
-        });
-    })
-    .then(function(result) {
-        var createdEventObj = result.eventModel.toJSON();
-        createdEventObj.target = result.targetModel.toJSON();
-        var publicEventObj = _privateToPublicEvent(createdEventObj);
-
-        serviceUtils.deleteFromRedis(
-            CONST.REDIS_PREFIX.EVENT_SUMMARIES,
-            publicEventObj.targetNamespace,
-            publicEventObj.targetId
-        );
-
-        return formatEventSafe(publicEventObj, internalOpts);
-    });
-    */
+function createEvent(eventObj) {
+    var newEvent = new Event_(eventObj);
+    return newEvent.save(null, {method: 'insert'});
 }
 
-function updateEvent(eventId, updatedPublicEventObj, internalOpts) {
-    return undefined;
-
-    /*
-    validate(eventId, 'id', modelUtils.schema.bigInteger().required());
-    internalOpts = _.merge({
-        includeAllFields: false
-    }, internalOpts);
-
-    return bookshelf.transaction(function(trx) {
-        return Event
-        .forge({id: eventId})
-        .fetch({transacting: trx, withRelated: ['target']})
-        .then(function(eventModel) {
-            if (!eventModel) {
-                var err = new Error('Event does not exist');
-                err.status = 404;
-                throw err;
-            }
-
-            var eventObj = eventModel.toJSON();
-            var updatedTargetObj = _publicToPrivateTarget(updatedPublicEventObj);
-            var updatedEventObj = _publicToPrivateEvent(updatedPublicEventObj);
-
-            // Promise chain is a bit messy but this way errors are caught
-            return Promise.resolve()
-            .then(function() {
-                var alreadyHasNumericEvent = _.isNumber(eventObj.event);
-                if (!alreadyHasNumericEvent) {
-                    return _throwIfTooManyNumericEvents(
-                        updatedTargetObj.externalId,
-                        updatedEventObj.authorId,
-                        updatedEventObj.event,
-                        {trx: trx}
-                    );
-                }
-            })
-            .then(function() {
-                return targetService.updateTarget(
-                    eventObj.target.id,
-                    updatedTargetObj,
-                    {transacting: trx}
-                );
-            })
-            .then(function(savedTargetModel) {
-                // Forbid updating some fields
-                delete updatedEventObj.id;
-                delete updatedEventObj.authorRole;
-
-                return eventModel.save(updatedEventObj, {transacting: trx})
-                .then(function(savedEventModel) {
-                    return [savedTargetModel, savedEventModel];
-                });
-            });
-        });
-    })
-    .spread(function(targetModel, eventModel) {
-        var updatedEventObj = eventModel.toJSON();
-        updatedEventObj.target = targetModel.toJSON();
-        var publicEventObj = _privateToPublicEvent(updatedEventObj);
-
-        // Use the newly modified object attributes. The update operation
-        // might have changed targetId and targetNamespace for the event
-        serviceUtils.deleteFromRedis(
-            CONST.REDIS_PREFIX.EVENT_SUMMARIES,
-            publicEventObj.targetNamespace,
-            publicEventObj.targetId
-        );
-
-        return formatEventSafe(publicEventObj, internalOpts);
-    });
-    */
+function updateEvent(eventId, eventObj, opts) {
+    return Event_.forge({id: eventId}).save(eventObj, opts);
 }
 
 function deleteEvent(eventId) {
-    return undefined;
-
-    /*
     validate(eventId, 'id', modelUtils.schema.bigInteger().required());
 
     return bookshelf.transaction(function(trx) {
-        return Event
-        .forge({
-            id: eventId
-        })
-        .fetch({transacting: trx, withRelated: ['target']})
+        return Event_
+        .where({id: eventId})
+        .fetch()
         .then(function(model) {
             if (!model) {
                 var err = new Error('Event does not exist');
@@ -337,18 +181,18 @@ function deleteEvent(eventId) {
                 throw err;
             }
 
-            // Note: targets are never deleted
             return [model.destroy({transacting: trx}), model.toJSON()];
-        })
+        });
+        /*
         .spread(function(destroyValue, deletedEventObj) {
             serviceUtils.deleteFromRedis(
                 CONST.REDIS_PREFIX.EVENT_SUMMARIES,
                 deletedEventObj.target.namespace,
-                deletedEventObj.target.externalId
+                deletedEventObj.,
             );
         });
+        */
     });
-    */
 }
 
 function formatEventSafe(publicEventObj, opts) {

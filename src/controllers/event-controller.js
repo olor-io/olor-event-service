@@ -77,21 +77,15 @@ var postEvent = createJsonRoute(function postEvent(req, res) {
         categoryId:       req.body.categoryId
     };
 
-    /*
-    var userRole = req.user.userRole;
-
-    if (authService.isRoleAboveService(userRole)) {
-        eventObj.published = req.body.published;
-        eventObj.moderated = req.body.moderated;
-        serviceOpts.includeAllFields = true;
-    }
-
-    throwIfAuthorRoleNotAllowed(userRole, eventObj.authorRole);
-    */
+    var createdAt = new Date();
+    eventObj = _.merge({
+        createdAt: createdAt,
+        updatedAt: createdAt
+    }, eventObj);
 
     logger.info('operation=createEvent');
     logger.info('headers: ' + JSON.stringify(req.headers));
-    return eventService.createEvent(eventObj, serviceOpts);
+    return eventService.createEvent(eventObj);
 });
 
 var putEvent = createJsonRoute(function putEvent(req, res) {

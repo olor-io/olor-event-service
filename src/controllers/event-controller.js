@@ -62,7 +62,7 @@ var getEvent = createJsonRoute(function getEvent(req, res) {
 var postEvent = createJsonRoute(function postEvent(req, res) {
     var serviceOpts = {};
     var eventObj = {
-        id:               req.body.id,
+        //id:               req.body.id,
         name:             req.body.name,
         description:      req.body.description,
         startTime:        req.body.startTime,
@@ -102,7 +102,7 @@ var putEvent = createJsonRoute(function putEvent(req, res) {
             throw err;
         }
         */
-        var serviceOpts = {};
+        //var serviceOpts = {};
         var eventObj = {
             id:               req.body.id,
             name:             req.body.name,
@@ -112,12 +112,18 @@ var putEvent = createJsonRoute(function putEvent(req, res) {
             maxParticipants:  req.body.maxParticipants,
             curParticipants:  req.body.curParticipants,
             coordinates:      req.body.coordinates,
-            creatorId:        req.body.creatorId,
+            creatorId:        existingEvent.creatorId,
             adminId:          req.body.adminId,
             reviewDeadline:   req.body.reviewDeadline,
             chatId:           req.body.chatId,
-            categoryId:       req.body.categoryId
+            categoryId:       req.body.categoryId,
+            createdAt:        existingEvent.createdAt
         };
+
+        var updatedAt = new Date();
+        eventObj = _.merge({
+            updatedAt: updatedAt
+        }, eventObj);
 
         /*
         if (authService.isRoleAboveService(userRole)) {
@@ -136,6 +142,8 @@ var putEvent = createJsonRoute(function putEvent(req, res) {
 
         logger.info('operation=updateEvent eventId=' + eventId);
         logger.info('headers: ' + JSON.stringify(req.headers));
+        logger.info('body: ' + JSON.stringify(eventObj));
+        //return eventService.updateEvent(eventId, eventObj);
         return eventService.updateEvent(eventId, eventObj);
     });
 });

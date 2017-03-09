@@ -56,10 +56,6 @@ var ALLOWED_SORT_KEYS = [
     'userId',
     'eventId',
     'categoryId',
-    'name',
-    'maxParticipants',
-    'curParticipants',
-    'coordinates',
     'creatorId',
     'adminId',
     'createdAt',
@@ -92,29 +88,33 @@ var USER_EVENTS_TABLE = UserEvent.prototype.tableName;
 // This method uses knex directly to improve performance:
 // See this issue: https://github.com/tgriesser/bookshelf/issues/774
 function getEvents(params, internalOpts) {
-
     // Opts for internal use: meaning that other services may use these options
     internalOpts = _.merge({
-        disableLimit: true,
+        disableLimit: false,
         includeAllFields: true
     }, internalOpts);
 
     var opts = serviceUtils.pickAndValidateListOpts(params, ALLOWED_SORT_KEYS);
-    /*
     var whereObj = serviceUtils.pickAndValidateWheres(
-        params, PUBLIC_TO_MODEL, ALLOWED_MULTI_SEARCH_KEYS
+        params,
+        PUBLIC_TO_MODEL,
+        ALLOWED_MULTI_SEARCH_KEYS
     );
-    */
 
     // Execute query
     var queryBuilder;
     queryBuilder = knex;
     queryBuilder = queryBuilder.select().from(EVENTS_TABLE);
 
+    serviceUtils.addWheresToQuery(queryBuilder, whereObj, PUBLIC_TO_MODEL);
+
     var countQueryOpts = { trx: internalOpts.trx };
     var countQuery = serviceUtils.countQuery(queryBuilder, countQueryOpts);
 
-    // See later: are limiting, wheres and offsets are needed for queries?
+    if (!internalOpts.disableLimit)
+        queryBuilder = queryBuilder.limit(opts.limit);
+
+    queryBuilder = queryBuilder.offset(opts.offset);
     serviceUtils.addSortsToQuery(queryBuilder, opts.sort, PUBLIC_TO_MODEL);
 
     return countQuery.then(function(res) {
@@ -163,8 +163,15 @@ function createEvent(eventObj) {
     return newEvent.save(null, {method: 'insert'});
 }
 
-function updateEvent(eventId, eventObj, opts) {
-    return Event_.forge({id: eventId}).save(eventObj, opts);
+function updateEvent(eventId, updatedEventObj) {
+    return bookshelf.transaction(function(trx) {
+        return Event_
+        .where({id: eventId})
+        .fetch()
+        .then(function(eventModel) {
+            return eventModel.save(updatedEventObj, {transacting: trx})
+        });
+    });
 }
 
 function deleteEvent(eventId) {
@@ -174,14 +181,14 @@ function deleteEvent(eventId) {
         return Event_
         .where({id: eventId})
         .fetch()
-        .then(function(model) {
-            if (!model) {
+        .then(function(eventModel) {
+            if (!eventModel) {
                 var err = new Error('Event does not exist');
                 err.status = 404;
                 throw err;
             }
 
-            return [model.destroy({transacting: trx}), model.toJSON()];
+            return [eventModel.destroy(), eventModel.toJSON()];
         });
         /*
         .spread(function(destroyValue, deletedEventObj) {

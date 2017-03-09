@@ -22,8 +22,8 @@ exports.up = function(knex, Promise) {
         table.integer('cur_participants').notNullable();
         table.string('coordinates').notNullable().index();
         table.dateTime('review_deadline').notNullable();
-        table.integer('creator_id').notNullable().index();
-        table.integer('admin_id').notNullable().index();
+        table.string('creator_id').notNullable().index();
+        table.string('admin_id').notNullable().index();
         table.integer('chat_id').notNullable();
         table.integer('category_id').notNullable().index();
         table.timestamp('created_at').index();

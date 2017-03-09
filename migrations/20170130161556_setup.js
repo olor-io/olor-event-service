@@ -8,8 +8,8 @@ exports.up = function(knex, Promise) {
         table.increments('id').primary().index();
         table.integer('user_id').notNullable().index();
         table.integer('event_id').notNullable().index();
-        table.timestamp('created_at');
-        table.timestamp('updated_at');
+        table.timestamp('created_at').index();
+        table.timestamp('updated_at').index();
     })
     .createTableIfNotExists('events', function(table) {
         // Create table events
@@ -26,8 +26,8 @@ exports.up = function(knex, Promise) {
         table.integer('admin_id').notNullable().index();
         table.integer('chat_id').notNullable();
         table.integer('category_id').notNullable().index();
-        table.timestamp('created_at');
-        table.timestamp('updated_at');
+        table.timestamp('created_at').index();
+        table.timestamp('updated_at').index();
     })
     .table('user_events', function(table) {
         // Add event_id foreign key after both tables are created

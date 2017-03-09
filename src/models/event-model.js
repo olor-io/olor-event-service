@@ -11,7 +11,7 @@ var schema = {
     duration: Joi.number().integer().required(),
     maxParticipants: Joi.number().integer().required(),
     curParticipants: Joi.number().integer().required(),
-    coordinates: modelUtils.schema.stringId().required(),
+    coordinates: Joi.string().required(),
     creatorId: modelUtils.schema.stringId().required(),
     adminId: modelUtils.schema.stringId().required(),
     reviewDeadline: Joi.date().iso().required(),

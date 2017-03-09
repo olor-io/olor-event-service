@@ -12,4 +12,4 @@ CREATE DATABASE community_app_events_test
   lc_ctype 'fi_FI.UTF-8'
   encoding 'UTF8'
   template template0;
-GRANT ALL PRIVILEGES ON DATABASE community_events_test to community;
+GRANT ALL PRIVILEGES ON DATABASE community_app_events_test to community;

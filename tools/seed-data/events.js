@@ -12,7 +12,9 @@ var events = [
         adminId: 1,
         reviewDeadline: new Date(2017, 4, 1, 23, 59, 59),
         chatId: 1,
-        categoryId: 1
+        categoryId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
     },
     {
         id: 2,
@@ -27,12 +29,14 @@ var events = [
         adminId: 2,
         reviewDeadline: new Date(2017, 9, 12),
         chatId: 2,
-        categoryId: 4
+        categoryId: 4,
+        createdAt: new Date(),
+        updatedAt: new Date()
     },
     {
         id: 3,
-        name: '"Totally-Not-A-Date"-bileet',
-        description: 'Täähän _ei siis ole_ Tinder',
+        name: 'Totally-Not-A-Date -bileet',
+        description: 'Tää ei ole Tinder',
         startTime: new Date(2017, 2, 15),
         duration: 4,
         maxParticipants: 3,
@@ -42,11 +46,13 @@ var events = [
         adminId: 3,
         reviewDeadline: new Date(2017, 3, 15),
         chatId: 3,
-        categoryId: 3
+        categoryId: 3,
+        createdAt: new Date(),
+        updatedAt: new Date()
     },
     {
         id: 4,
-        name: '"Totally-Not-A-Date"-bileet',
+        name: 'Tinder-bileet',
         description: 'Täähän _ei siis ole_ Tinder',
         startTime: new Date(2017, 2, 15, 18, 0, 0),
         duration: 4,
@@ -57,7 +63,9 @@ var events = [
         adminId: 2,
         reviewDeadline: new Date(2017, 3, 15),
         chatId: 4,
-        categoryId: 4
+        categoryId: 4,
+        createdAt: new Date(),
+        updatedAt: new Date()
     },
     {
         id: 5,
@@ -72,7 +80,9 @@ var events = [
         adminId: 3,
         reviewDeadline: new Date(2017, 3, 15),
         chatId: 5,
-        categoryId: 5
+        categoryId: 5,
+        createdAt: new Date(),
+        updatedAt: new Date()
     },
     {
         id: 6,
@@ -87,7 +97,9 @@ var events = [
         adminId: 4,
         reviewDeadline: new Date(2017, 3, 15),
         chatId: 6,
-        categoryId: 6
+        categoryId: 6,
+        createdAt: new Date(),
+        updatedAt: new Date()
     },
     {
         id: 7,
@@ -102,7 +114,9 @@ var events = [
         adminId: 7,
         reviewDeadline: new Date(2017, 3, 15),
         chatId: 7,
-        categoryId: 7
+        categoryId: 7,
+        createdAt: new Date(),
+        updatedAt: new Date()
     },
     {
         id: 8,
@@ -117,7 +131,9 @@ var events = [
         adminId: 8,
         reviewDeadline: new Date(2017, 3, 15),
         chatId: 8,
-        categoryId: 4
+        categoryId: 4,
+        createdAt: new Date(),
+        updatedAt: new Date()
     }
 ];
 

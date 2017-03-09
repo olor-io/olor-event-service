@@ -49,7 +49,6 @@ function getQueryBoolean(queryValue) {
     if (_.isString(queryValue)) {
         return queryValue.toLowerCase() === 'true';
     }
-
     return undefined;
 }
 

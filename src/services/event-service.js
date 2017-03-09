@@ -17,7 +17,7 @@ var bookshelf = db.bookshelf;
 
 // Maps public API attributes to internal database objects
 var PUBLIC_TO_MODEL = {
-    userId: {UserEvent, attribute: 'userId'},
+    userId: {model: UserEvent, attribute: 'userId'},
     eventId: {model: UserEvent, attribute: 'eventId'},
     categoryId: {model: Event_, attribute: 'categoryId'},
     chatId: {model: Event_, attribute: 'chat'},
@@ -32,7 +32,7 @@ var PUBLIC_TO_MODEL = {
     adminId: {model: Event_, attribute: 'adminId'},
     reviewDeadline: {model: Event_, attribute: 'reviewDeadline'},
     createdAt: {model: Event_, attribute: 'createdAt'},
-    updatedAt: {model: Event_, attribute: 'updatedAt'},
+    updatedAt: {model: Event_, attribute: 'updatedAt'}
 };
 
 // Based on these columns, events can be searched so that
@@ -58,10 +58,13 @@ var ALLOWED_SORT_KEYS = [
     'eventId',
     'categoryId',
     'name',
+    'maxParticipants',
+    'curParticipants',
     'coordinates',
     'creatorId',
     'adminId',
-    'reviewDeadline'
+    'createdAt',
+    'updatedAt'
 ];
 
 // Fields which will be only returned for service users, others are considered
@@ -92,10 +95,9 @@ var USER_EVENTS_TABLE = UserEvent.prototype.tableName;
 function getEvents(params, internalOpts) {
 
     // Opts for internal use: meaning that other services may use these options
-    // to e.g. disable safety features
     internalOpts = _.merge({
-        disableLimit: false,
-        includeAllFields: false
+        disableLimit: true,
+        includeAllFields: true
     }, internalOpts);
 
     var opts = serviceUtils.pickAndValidateListOpts(params, ALLOWED_SORT_KEYS);
@@ -111,16 +113,15 @@ function getEvents(params, internalOpts) {
     var countQueryOpts = { trx: internalOpts.trx };
     var countQuery = serviceUtils.countQuery(queryBuilder, countQueryOpts);
 
-    // See later:
-    //  are limiting, wheres and offsets are needed for queries?
-
+    // See later: are limiting, wheres and offsets are needed for queries?
     serviceUtils.addSortsToQuery(queryBuilder, opts.sort, PUBLIC_TO_MODEL);
 
     return countQuery.then(function(res) {
         var totalCount = Number(res[0].count);
-        return queryBuilder.then(fuction(rows) {
+
+        return queryBuilder.then(function(rows) {
             var data = _.map(rows, function(row) {
-                var publicEventObj = Event.prototype.parse(row);
+                var publicEventObj = Event_.prototype.parse(row);
                 return formatEventSafe(publicEventObj, internalOpts);
             });
 
@@ -135,15 +136,17 @@ function getEvents(params, internalOpts) {
 // XXX: This method, like others besides getEvents do not care about the
 //      published status of events. Is this needed?
 function getEvent(eventId, internalOpts) {
+    logger.info('eventId: ' + eventId);
     validate(eventId, 'id', modelUtils.schema.bigInteger().required());
     internalOpts = _.merge({
-        includeAllFields: false
+        includeAllFields: true
     }, internalOpts);
 
     return Event_
-    .forge({id: eventId})
+    .where({id: eventId})
+    .fetch()
     .then(function(model) {
-        if(!model) {
+        if (!model) {
             var err = new Error('Event does not exist');
             err.status = 404;
             throw err;
@@ -155,8 +158,7 @@ function getEvent(eventId, internalOpts) {
 }
 
 function createEvent(eventObj, internalOpts) {
-
-
+    return undefined;
 
     /*
     internalOpts = _.merge({
@@ -243,6 +245,8 @@ function createEvent(eventObj, internalOpts) {
 }
 
 function updateEvent(eventId, updatedPublicEventObj, internalOpts) {
+    return undefined;
+
     /*
     validate(eventId, 'id', modelUtils.schema.bigInteger().required());
     internalOpts = _.merge({
@@ -315,6 +319,8 @@ function updateEvent(eventId, updatedPublicEventObj, internalOpts) {
 }
 
 function deleteEvent(eventId) {
+    return undefined;
+
     /*
     validate(eventId, 'id', modelUtils.schema.bigInteger().required());
 

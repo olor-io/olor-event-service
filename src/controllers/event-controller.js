@@ -1,36 +1,27 @@
+var CONST = require('../constants');
 var logger = require('../logger')(__filename);
 var _ = require('lodash');
-var ratingService = require('../services/event-service');
-//var authService = require('../services/auth-service');
+var eventService = require('../services/event-service');
 var controllerUtils = require('./controller-utils');
-var Event_ = require('../models/event-model');
-var CONST = require('../constants');
-var validate = require('../services/service-utils').validate;
 var createJsonRoute = controllerUtils.createJsonRoute;
-
-var FORBIDDEN_MESSAGE = 'Forbidden. Author is not allowed to do the operation.';
+//var Event_ = require('../models/event-model');
+//var validate = require('../services/service-utils').validate;
+// var authService = require('../services/auth-service');
+// var FORBIDDEN_MESSAGE = 'Forbidden. Author is not allowed to do the operation.';
 
 var getEvents = createJsonRoute(function getEvents(req, res) {
-    // This should be kept in sync with getEventsReport in report-controller
     var params = {
-        id:               req.params.id,
-        name:             req.params.name,
-        description:      req.params.description,
-        startTime:        req.params.startTime,
-        duration:         req.params.duration,
-        maxParticipants:  req.params.maxParticipants,
-        curParticipants:  req.params.curParticipants,
-        coordinates:      req.params.coordinates,
-        creatorId:        req.params.creatorId,
-        adminId:          req.params.adminId,
-        reviewDeadline:   req.params.reviewDeadline,
-        chatId:           req.params.chatId,
-        categoryId:       req.params.categoryId
+        id:              req.params.id,
+        creatorId:       req.query.creatorId,
+        adminId:         req.query.adminId,
+        categoryId:      req.query.categoryId,
+        offset:          req.query.offset,
+        limit:           req.query.limit
     };
-
     var serviceOpts = {};
-    var userRole = req.user.userRole;
+
     /*
+    var userRole = req.user.userRole;
     if (authService.isRoleAboveService(userRole)) {
         params.authorRole = req.query.authorRole;
         params.published = controllerUtils.getQueryBoolean(req.query.published);
@@ -43,61 +34,20 @@ var getEvents = createJsonRoute(function getEvents(req, res) {
         params.published = true;
     }
     */
-
+    /*
     if (_.isArray(req.query.sort)) {
         params.sort = _.map(req.query.sort, controllerUtils.splitSortString);
     } else if (_.isString(req.query.sort)) {
         params.sort = [controllerUtils.splitSortString(req.query.sort)];
     }
-
-    return ratingService.getEvents(params, serviceOpts)
+    */
+    return eventService.getEvents(params, serviceOpts)
     .then(function(result) {
         res.setHeader(CONST.HEADER_TOTAL_COUNT, result.totalCount);
         return result.data;
     });
 });
 
-var postEvent = createJsonRoute(function postEvent(req, res) {
-    var ratingObj = {
-        /*
-        targetId:        req.body.targetId,
-        targetNamespace: req.params.targetNamespace,
-        event:           req.body.event,
-        comment:         req.body.comment,
-        name:            req.body.name,
-        url:             req.body.url,
-        category:        req.body.category,
-        subCategory:     req.body.subCategory,
-        // Prevent changing author with body
-        authorId:        req.user.authorId,
-        authorName:      req.body.authorName,
-        authorRole:      req.body.authorRole,
-        replyRequested:  req.body.replyRequested,
-        ipAddress:       req.headers['x-ip-address']
-        */
-
-    };
-
-    var serviceOpts = {};
-    var userRole = req.user.userRole;
-    /*
-    if (authService.isRoleAboveService(userRole)) {
-        ratingObj.published = req.body.published;
-        ratingObj.moderated = req.body.moderated;
-        serviceOpts.includeAllFields = true;
-    }
-    */
-
-    //throwIfAuthorRoleNotAllowed(userRole, ratingObj.authorRole);
-
-    logger.info('operation=createEvent');
-    logger.info('headers: ' + JSON.stringify(req.headers));
-    return ratingService.createEvent(ratingObj, serviceOpts);
-});
-
-// XXX: Now it's possible to get ratings which are not published by knowing their id
-//      Users need to see their own ratings but this allowes also others to see
-//      them
 var getEvent = createJsonRoute(function getEvent(req, res) {
     var serviceOpts = {};
     /*
@@ -106,14 +56,48 @@ var getEvent = createJsonRoute(function getEvent(req, res) {
         serviceOpts.includeAllFields = true;
     }
     */
-    return ratingService.getEvent(req.params.id, serviceOpts);
+    return eventService.getEvent(req.params.id, serviceOpts);
+});
+
+var postEvent = createJsonRoute(function postEvent(req, res) {
+    var serviceOpts = {};
+    var eventObj = {
+        id:               req.body.id,
+        name:             req.body.name,
+        description:      req.body.description,
+        startTime:        req.body.startTime,
+        duration:         req.body.duration,
+        maxParticipants:  req.body.maxParticipants,
+        curParticipants:  req.body.curParticipants,
+        coordinates:      req.body.coordinates,
+        creatorId:        req.body.creatorId,
+        adminId:          req.body.adminId,
+        reviewDeadline:   req.body.reviewDeadline,
+        chatId:           req.body.chatId,
+        categoryId:       req.body.categoryId
+    };
+
+    /*
+    var userRole = req.user.userRole;
+
+    if (authService.isRoleAboveService(userRole)) {
+        eventObj.published = req.body.published;
+        eventObj.moderated = req.body.moderated;
+        serviceOpts.includeAllFields = true;
+    }
+
+    throwIfAuthorRoleNotAllowed(userRole, eventObj.authorRole);
+    */
+
+    logger.info('operation=createEvent');
+    logger.info('headers: ' + JSON.stringify(req.headers));
+    return eventService.createEvent(eventObj, serviceOpts);
 });
 
 var putEvent = createJsonRoute(function putEvent(req, res) {
-    var ratingId = req.params.id;
-    var userRole = req.user.userRole;
+    var eventId = req.params.id;
 
-    return ratingService.getEvent(ratingId)
+    return eventService.getEvent(eventId)
     .then(function(existingEvent) {
         // Prevent author x from modifying author y's event
         /*
@@ -124,56 +108,48 @@ var putEvent = createJsonRoute(function putEvent(req, res) {
             throw err;
         }
         */
-        var ratingObj = {
-            targetId:        req.body.targetId,
-            targetNamespace: req.body.targetNamespace,
-            event:          req.body.event,
-            comment:         req.body.comment,
-            name:            req.body.name,
-            url:             req.body.url,
-            category:        req.body.category,
-            subCategory:     req.body.subCategory,
-            // Prevent changing author with new body
-            authorId:        req.user.authorId,
-            authorName:      req.body.authorName,
-            authorRole:      req.body.authorRole,
-            replyRequested:  req.body.replyRequested
+        var serviceOpts = {};
+        var eventObj = {
+            id:               req.body.id,
+            name:             req.body.name,
+            description:      req.body.description,
+            startTime:        req.body.startTime,
+            duration:         req.body.duration,
+            maxParticipants:  req.body.maxParticipants,
+            curParticipants:  req.body.curParticipants,
+            coordinates:      req.body.coordinates,
+            creatorId:        req.body.creatorId,
+            adminId:          req.body.adminId,
+            reviewDeadline:   req.body.reviewDeadline,
+            chatId:           req.body.chatId,
+            categoryId:       req.body.categoryId
         };
 
-        // If ip address header is not sent, don't replace the old ip address
-        // with empty value
-        var ipAddress = req.headers['x-ip-address'];
-        if (ipAddress) {
-            ratingObj.ipAddress = ipAddress;
-        }
-
-        var serviceOpts = {};
         /*
         if (authService.isRoleAboveService(userRole)) {
-            ratingObj.published = req.body.published;
-            ratingObj.moderated = req.body.moderated;
+            eventObj.published = req.body.published;
+            eventObj.moderated = req.body.moderated;
             serviceOpts.includeAllFields = true;
 
             // If report count is explicitly set, we can update it
             if (_.isNumber(req.body.reportCount)) {
-                ratingObj.reportCount = req.body.reportCount;
+                eventObj.reportCount = req.body.reportCount;
             }
         }
 
-        throwIfAuthorRoleNotAllowed(userRole, ratingObj.authorRole);
+        throwIfAuthorRoleNotAllowed(userRole, eventObj.authorRole);
         */
 
-        logger.info('operation=updateEvent ratingId=' + ratingId);
+        logger.info('operation=updateEvent eventId=' + eventId);
         logger.info('headers: ' + JSON.stringify(req.headers));
-        return ratingService.updateEvent(ratingId, ratingObj, serviceOpts);
+        return eventService.updateEvent(eventId, eventObj);
     });
 });
 
 var deleteEvent = createJsonRoute(function deleteEvent(req, res) {
-    var ratingId = req.params.id;
-    var userRole = req.user.userRole;
+    var eventId = req.params.id;
 
-    return ratingService.getEvent(ratingId)
+    return eventService.getEvent(eventId)
     .then(function(existingEvent) {
         // Prevent author x from deleting author y's event
         /*
@@ -185,13 +161,12 @@ var deleteEvent = createJsonRoute(function deleteEvent(req, res) {
         }
         */
 
-        logger.info('operation=deleteEvent ratingId=' + ratingId);
+        logger.info('operation=deleteEvent eventId=' + eventId);
         logger.info('headers: ' + JSON.stringify(req.headers));
-        return ratingService.deleteEvent(ratingId);
+        return eventService.deleteEvent(eventId);
     })
     .then(function() {
-        // If deletion succeeds, return undefined which will be responded
-        // as empty body
+        // If deletion succeeds, return undefined -> empty body
         return undefined;
     });
 });

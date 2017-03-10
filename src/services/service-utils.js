@@ -169,7 +169,7 @@ function validateBoolean(val, name) {
 // which models. It can also be a single model which will be used with all keys
 function pickAndValidateWheres(obj, publicToModel, allowedKeys) {
     // Pick all keys which are allowed in the query
-    var whereObj = _.pick(obj, function(val, key) {
+    var whereObj = _.pickBy(obj, function(val, key) {
         var isAllowed = _.isArray(allowedKeys)
             ? _.contains(allowedKeys, key)
             : true;

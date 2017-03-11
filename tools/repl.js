@@ -22,9 +22,6 @@ function capitalize(str) {
 
 var models = {};
 var modelsPath = path.join(__dirname, '../src/models');
-var test = fs.readdirSync(modelsPath);
-
-console.log(JSON.stringify(test));
 
 fs.readdirSync(modelsPath).forEach(function(file) {
     console.log(file);

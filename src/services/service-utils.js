@@ -183,8 +183,9 @@ function pickAndValidateWheres(obj, publicToModel, allowedKeys) {
         }
 
         var attributeSchema = Model.prototype.schema[modelAttribute];
-        if (!attributeSchema)
+        if (!attributeSchema) {
             attributeSchema = BASE_SCHEMA[modelAttribute];
+        }
 
         var joiValidate = attributeSchema.optional();
         if (_.isArray(val)) {

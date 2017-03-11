@@ -169,12 +169,16 @@ function validateBoolean(val, name) {
 // which models. It can also be a single model which will be used with all keys
 function pickAndValidateWheres(obj, publicToModel, allowedKeys) {
     // Pick all keys which are allowed in the query
-    var whereObj = _.pick(obj, function(val, key) {
+    var whereObj = _.pickBy(obj, function(val, key) {
+        logger.info('does this work inside here? ' + 'key: ' + key + ', val: ' + val);
         var isAllowed = _.isArray(allowedKeys)
-            ? _.contains(allowedKeys, key)
+            ? _.includes(allowedKeys, key)
             : true;
         return isAllowed && !_.isUndefined(val);
     });
+
+    logger.info('WhereValidation (obj): ' + JSON.stringify(obj));
+    logger.info('WhereValidation (whereObj): ' + JSON.stringify(whereObj));
 
     // Validate all values used in the where query
     _.each(whereObj, function(val, whereKey) {
@@ -189,9 +193,8 @@ function pickAndValidateWheres(obj, publicToModel, allowedKeys) {
         }
 
         var attributeSchema = Model.prototype.schema[modelAttribute];
-        if (!attributeSchema) {
+        if (!attributeSchema)
             attributeSchema = BASE_SCHEMA[modelAttribute];
-        }
 
         var joiValidate = attributeSchema.optional();
         if (_.isArray(val)) {
@@ -207,7 +210,8 @@ function pickAndValidateWheres(obj, publicToModel, allowedKeys) {
 }
 
 function pickAndValidateListOpts(obj, allowedSortKeys, serviceDefaults) {
-    serviceDefaults = serviceDefaults || {};
+    logger.info('ListOptsValidation (obj): ' + JSON.stringify(obj));
+    logger.info('ListOptsValidation (serviceDefaults): ' + JSON.stringify(serviceDefaults));
 
     var opts = extendOmitUndefined({
         // These are the internal defaults, services can have their own
@@ -217,6 +221,7 @@ function pickAndValidateListOpts(obj, allowedSortKeys, serviceDefaults) {
         sort: [['updatedAt', 'asc']]
     }, serviceDefaults);
 
+    logger.info('ListOptsValidation (opts): ' + JSON.stringify(opts));
     opts = extendOmitUndefined(opts, _.pick(obj, ['limit', 'offset', 'sort']));
 
     validateLimit(opts.limit);

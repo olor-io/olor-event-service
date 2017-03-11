@@ -40,14 +40,11 @@ var ALLOWED_MULTI_SEARCH_KEYS = [
     'userId',
     'eventId',
     'categoryId',
-    'name',
     'maxParticipants',
     'curParticipants',
     'coordinates',
     'creatorId',
-    'adminId',
-    'createdAt',
-    'updatedAt'
+    'adminId'
 ];
 
 // These should correspond to indexes in database
@@ -94,7 +91,11 @@ function getEvents(params, internalOpts) {
         includeAllFields: true
     }, internalOpts);
 
-    var opts = serviceUtils.pickAndValidateListOpts(params, ALLOWED_SORT_KEYS);
+    var opts = serviceUtils.pickAndValidateListOpts(
+        params,
+        ALLOWED_SORT_KEYS,
+        params);
+
     var whereObj = serviceUtils.pickAndValidateWheres(
         params,
         PUBLIC_TO_MODEL,
@@ -106,14 +107,13 @@ function getEvents(params, internalOpts) {
     queryBuilder = knex;
     queryBuilder = queryBuilder.select().from(EVENTS_TABLE);
 
-    serviceUtils.addWheresToQuery(queryBuilder, whereObj, PUBLIC_TO_MODEL);
-
     var countQueryOpts = { trx: internalOpts.trx };
     var countQuery = serviceUtils.countQuery(queryBuilder, countQueryOpts);
 
     if (!internalOpts.disableLimit)
         queryBuilder = queryBuilder.limit(opts.limit);
 
+    serviceUtils.addWheresToQuery(queryBuilder, whereObj, PUBLIC_TO_MODEL);
     queryBuilder = queryBuilder.offset(opts.offset);
     serviceUtils.addSortsToQuery(queryBuilder, opts.sort, PUBLIC_TO_MODEL);
 
@@ -137,7 +137,6 @@ function getEvents(params, internalOpts) {
 // XXX: This method, like others besides getEvents do not care about the
 //      published status of events. Is this needed?
 function getEvent(eventId, internalOpts) {
-    logger.info('eventId: ' + eventId);
     validate(eventId, 'id', modelUtils.schema.bigInteger().required());
     internalOpts = _.merge({
         includeAllFields: true

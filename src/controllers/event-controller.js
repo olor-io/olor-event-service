@@ -4,8 +4,8 @@ var _ = require('lodash');
 var eventService = require('../services/event-service');
 var controllerUtils = require('./controller-utils');
 var createJsonRoute = controllerUtils.createJsonRoute;
-//var Event_ = require('../models/event-model');
-//var validate = require('../services/service-utils').validate;
+// var Event_ = require('../models/event-model');
+// var validate = require('../services/service-utils').validate;
 // var authService = require('../services/auth-service');
 // var FORBIDDEN_MESSAGE = 'Forbidden. Author is not allowed to do the operation.';
 
@@ -15,32 +15,21 @@ var getEvents = createJsonRoute(function getEvents(req, res) {
         creatorId:       req.query.creatorId,
         adminId:         req.query.adminId,
         categoryId:      req.query.categoryId,
+        maxParticipants: req.query.maxParticipants,
+        curParticipants: req.query.curParticipants,
+        coordinates:     req.query.coordinates,
         offset:          req.query.offset,
         limit:           req.query.limit
     };
     var serviceOpts = {};
+    serviceOpts.includeAllFields = true;
 
-    /*
-    var userRole = req.user.userRole;
-    if (authService.isRoleAboveService(userRole)) {
-        params.authorRole = req.query.authorRole;
-        params.published = controllerUtils.getQueryBoolean(req.query.published);
-        params.moderated = controllerUtils.getQueryBoolean(req.query.moderated);
-        params.replyRequested = controllerUtils.getQueryBoolean(req.query.replyRequested);
-
-        serviceOpts.includeAllFields = true;
-    } else {
-        // Force services to search only published comments
-        params.published = true;
-    }
-    */
-    /*
     if (_.isArray(req.query.sort)) {
         params.sort = _.map(req.query.sort, controllerUtils.splitSortString);
     } else if (_.isString(req.query.sort)) {
         params.sort = [controllerUtils.splitSortString(req.query.sort)];
     }
-    */
+
     return eventService.getEvents(params, serviceOpts)
     .then(function(result) {
         res.setHeader(CONST.HEADER_TOTAL_COUNT, result.totalCount);
@@ -62,7 +51,7 @@ var getEvent = createJsonRoute(function getEvent(req, res) {
 var postEvent = createJsonRoute(function postEvent(req, res) {
     var serviceOpts = {};
     var eventObj = {
-        //id:               req.body.id,
+        //id:             req.body.id,
         name:             req.body.name,
         description:      req.body.description,
         startTime:        req.body.startTime,

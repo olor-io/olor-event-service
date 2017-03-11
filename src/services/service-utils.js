@@ -177,9 +177,6 @@ function pickAndValidateWheres(obj, publicToModel, allowedKeys) {
         return isAllowed && !_.isUndefined(val);
     });
 
-    logger.info('WhereValidation (obj): ' + JSON.stringify(obj));
-    logger.info('WhereValidation (whereObj): ' + JSON.stringify(whereObj));
-
     // Validate all values used in the where query
     _.each(whereObj, function(val, whereKey) {
         var Model;
@@ -210,9 +207,6 @@ function pickAndValidateWheres(obj, publicToModel, allowedKeys) {
 }
 
 function pickAndValidateListOpts(obj, allowedSortKeys, serviceDefaults) {
-    logger.info('ListOptsValidation (obj): ' + JSON.stringify(obj));
-    logger.info('ListOptsValidation (serviceDefaults): ' + JSON.stringify(serviceDefaults));
-
     var opts = extendOmitUndefined({
         // These are the internal defaults, services can have their own
         // defaults which will override these defaults
@@ -221,7 +215,6 @@ function pickAndValidateListOpts(obj, allowedSortKeys, serviceDefaults) {
         sort: [['updatedAt', 'asc']]
     }, serviceDefaults);
 
-    logger.info('ListOptsValidation (opts): ' + JSON.stringify(opts));
     opts = extendOmitUndefined(opts, _.pick(obj, ['limit', 'offset', 'sort']));
 
     validateLimit(opts.limit);

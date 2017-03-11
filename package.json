@@ -33,6 +33,7 @@
     "express": "4.14.x",
     "express-graceful-exit": "0.3.x",
     "express-session": "1.15.x",
+    "geolib": "^2.0.22",
     "ioredis": "2.5.x",
     "joi": "10.2.x",
     "knex": "0.12.x",

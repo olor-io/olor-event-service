@@ -152,6 +152,65 @@ function getEvent(eventId, internalOpts) {
     });
 }
 
+
+function getEventDistances(userCoordObj, internalOpts) {
+    // TODO:
+    //    Change coordinates to latitude and longitude for improved
+    //    validation, easier use and better coordination between services.
+    //    Cleanup and utility movements to service-utils.
+
+    internalOpts = _.merge({
+        disableLimit: false,
+        includeAllFields: true
+    }, internalOpts);
+
+    var queryBuilder = knex.select([
+        'id as id',
+        'coordinates as coordinates'
+    ])
+    .from(EVENTS_TABLE);
+
+    var countQueryOpts = { trx: internalOpts.trx };
+    var countQuery = serviceUtils.countQuery(queryBuilder, countQueryOpts);
+
+    if (!internalOpts.disableLimit)
+        queryBuilder = queryBuilder.limit(opts.limit);
+
+    queryBuilder = queryBuilder.offset(opts.offset);
+    serviceUtils.addSortsToQuery(queryBuilder, opts.sort, PUBLIC_TO_MODEL);
+
+    return countQuery.then(function(res) {
+        var totalCount = Number(res[0].count);
+
+        return queryBuilder.then(function(rows) {
+            var data = _.map(rows, function(row) {
+                var publicEventObj = Event_.prototype.parse(row);
+                var eventCoordObj = publicEventObj.coordinates.split(',');
+                eventCoordObj = _.zipObject(
+                  ['lat','long'],
+                  [eventCoordObj[0],eventCoordObj[1]]
+                );
+
+                // TODO:
+                //    Add distance var to Event_ model OR
+                //    create new model for utilities
+                publicEventObj.distance = geo.getDistance({
+                    [ userCoordObj.lat, userCoordObj.long ],
+                    [ eventCoordObj.lat, eventCoordObj.long ]
+                });
+
+                return formatEventSafe(publicObj, internalOpts);
+            });
+
+            return {
+                // totalCount passed to x-total-count response header
+                totalCount: totalCount,
+                data: data
+            };
+        });
+    });
+}
+
 function createEvent(eventObj) {
     // Validation on Event_.initialize
     // On validation error throws a 400 status with a message and stack

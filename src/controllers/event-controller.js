@@ -11,15 +11,16 @@ var createJsonRoute = controllerUtils.createJsonRoute;
 
 var getEvents = createJsonRoute(function getEvents(req, res) {
     var params = {
-        id:              req.params.id,
-        creatorId:       req.query.creatorId,
-        adminId:         req.query.adminId,
-        categoryId:      req.query.categoryId,
-        maxParticipants: req.query.maxParticipants,
-        curParticipants: req.query.curParticipants,
-        coordinates:     req.query.coordinates,
-        offset:          req.query.offset,
-        limit:           req.query.limit
+        id:               req.params.id,
+        creatorId:        req.query.creatorId,
+        adminId:          req.query.adminId,
+        categoryId:       req.query.categoryId,
+        maxParticipants:  req.query.maxParticipants,
+        curParticipants:  req.query.curParticipants,
+        lat:              req.query.lat,
+        long:             req.query.long,
+        offset:           req.query.offset,
+        limit:            req.query.limit
     };
     var serviceOpts = {};
     serviceOpts.includeAllFields = true;
@@ -48,6 +49,28 @@ var getEvent = createJsonRoute(function getEvent(req, res) {
     return eventService.getEvent(req.params.id, serviceOpts);
 });
 
+/*
+var getEventDistances = createJsonRoute(function getEventDistances(req, res) {
+    var serviceOpts = {};
+    serviceOpts.includeAllFields = true;
+
+    var params = {
+        id:              req.params.id,
+        coordinates:     req.query.coordinates,
+        offset:          req.query.offset,
+        limit:           req.query.limit
+    };
+
+    if (_.isArray(req.query.sort)) {
+        params.sort = _.map(req.query.sort, controllerUtils.splitSortString);
+    } else if (_.isString(req.query.sort)) {
+        params.sort = [controllerUtils.splitSortString(req.query.sort)];
+    }
+
+    return eventService.getEventDistances(params, internalOpts);
+});
+*/
+
 var postEvent = createJsonRoute(function postEvent(req, res) {
     var serviceOpts = {};
     var eventObj = {
@@ -58,7 +81,9 @@ var postEvent = createJsonRoute(function postEvent(req, res) {
         duration:         req.body.duration,
         maxParticipants:  req.body.maxParticipants,
         curParticipants:  req.body.curParticipants,
-        coordinates:      req.body.coordinates,
+        lat:              req.body.lat,
+        long:             req.body.long,
+        address:          req.body.address,
         creatorId:        req.body.creatorId,
         adminId:          req.body.adminId,
         reviewDeadline:   req.body.reviewDeadline,
@@ -100,7 +125,9 @@ var putEvent = createJsonRoute(function putEvent(req, res) {
             duration:         req.body.duration,
             maxParticipants:  req.body.maxParticipants,
             curParticipants:  req.body.curParticipants,
-            coordinates:      req.body.coordinates,
+            lat:              req.body.lat,
+            long:             req.body.long,
+            address:          req.body.address,
             creatorId:        existingEvent.creatorId,
             adminId:          req.body.adminId,
             reviewDeadline:   req.body.reviewDeadline,

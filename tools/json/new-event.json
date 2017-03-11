@@ -1,15 +1,16 @@
 {
-    "id": 9,
     "name": "Create-testi",
     "description": "Vitusti testiä",
     "startTime": "1994-11-05T13:15:30Z",
     "duration": 6,
     "maxParticipants": 600,
     "curParticipants": 1,
-    "coordinates": "60.192059, 24.945831",
-    "creatorId": "9",
-    "adminId": "9",
+    "lat": 47.376887,
+    "long": 178.541694,
+    "address": "Zurich, CH",
+    "creatorId": "8",
+    "adminId": "8",
     "reviewDeadline": "1994-11-05T13:15:30Z",
     "chatId": 9,
-    "categoryId": 9
+    "categoryId": 4
 }

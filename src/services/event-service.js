@@ -8,6 +8,7 @@ var serviceUtils = require('./service-utils');
 
 var Promise = require('bluebird');
 var _ = require('lodash');
+var geo = require('geolib');
 var logger = require('../logger')(__filename);
 var validate = serviceUtils.validate;
 var db = require('../database').connect();
@@ -26,7 +27,9 @@ var PUBLIC_TO_MODEL = {
     duration: {model: Event_, attribute: 'duration'},
     maxParticipants: {model: Event_, attribute: 'maxParticipants'},
     curParticipants: {model: Event_, attribute: 'curParticipants'},
-    coordinates: {model: Event_, attribute: 'coordinates'},
+    lat: {model: Event_, attribute: 'lat'},
+    long: {model: Event_, attribute: 'long'},
+    address: {model: Event_, attribute: 'address'},
     creatorId: {model: Event_, attribute: 'creatorId'},
     adminId: {model: Event_, attribute: 'adminId'},
     reviewDeadline: {model: Event_, attribute: 'reviewDeadline'},
@@ -42,7 +45,8 @@ var ALLOWED_MULTI_SEARCH_KEYS = [
     'categoryId',
     'maxParticipants',
     'curParticipants',
-    'coordinates',
+    'lat',
+    'long',
     'creatorId',
     'adminId'
 ];
@@ -54,6 +58,8 @@ var ALLOWED_SORT_KEYS = [
     'eventId',
     'categoryId',
     'creatorId',
+    'lat',
+    'long',
     'adminId',
     'createdAt',
     'updatedAt'
@@ -72,7 +78,9 @@ var SERVICE_USER_KEYS = [
     'duration',
     'maxParticipants',
     'curParticipants',
-    'coordinates',
+    'lat',
+    'long',
+    'address',
     'creatorId',
     'adminId',
     'createdAt',
@@ -91,28 +99,21 @@ function getEvents(params, internalOpts) {
         includeAllFields: true
     }, internalOpts);
 
-    var opts = serviceUtils.pickAndValidateListOpts(
-        params,
-        ALLOWED_SORT_KEYS,
-        params);
-
+    var opts = serviceUtils.pickAndValidateListOpts(params, ALLOWED_SORT_KEYS);
     var whereObj = serviceUtils.pickAndValidateWheres(
-        params,
-        PUBLIC_TO_MODEL,
-        ALLOWED_MULTI_SEARCH_KEYS
+        params, PUBLIC_TO_MODEL, ALLOWED_MULTI_SEARCH_KEYS
     );
 
     // Execute query
-    var queryBuilder;
-    queryBuilder = knex;
-    queryBuilder = queryBuilder.select().from(EVENTS_TABLE);
-
+    var queryBuilder = knex.select().from(EVENTS_TABLE);
     var countQueryOpts = { trx: internalOpts.trx };
     var countQuery = serviceUtils.countQuery(queryBuilder, countQueryOpts);
 
-    if (!internalOpts.disableLimit)
+    if (!internalOpts.disableLimit) {
         queryBuilder = queryBuilder.limit(opts.limit);
+    }
 
+    // Add wheres, offsets and sorts to query passed in params
     serviceUtils.addWheresToQuery(queryBuilder, whereObj, PUBLIC_TO_MODEL);
     queryBuilder = queryBuilder.offset(opts.offset);
     serviceUtils.addSortsToQuery(queryBuilder, opts.sort, PUBLIC_TO_MODEL);
@@ -127,6 +128,7 @@ function getEvents(params, internalOpts) {
             });
 
             return {
+                // totalCount passed to x-total-count response header
                 totalCount: totalCount,
                 data: data
             };
@@ -134,40 +136,33 @@ function getEvents(params, internalOpts) {
     });
 }
 
-// XXX: This method, like others besides getEvents do not care about the
-//      published status of events. Is this needed?
 function getEvent(eventId, internalOpts) {
     validate(eventId, 'id', modelUtils.schema.bigInteger().required());
     internalOpts = _.merge({
         includeAllFields: true
     }, internalOpts);
 
-    return Event_
-    .where({id: eventId})
-    .fetch()
-    .then(function(model) {
+    return Event_.where({id: eventId}).fetch().then(function(model) {
         if (!model) {
             var err = new Error('Event does not exist');
             err.status = 404;
             throw err;
         }
-        // Is public-private casting needed?
-        // var publicEventObj = _privateToPublicEvent(model.toJSON());
         return formatEventSafe(model.toJSON(), internalOpts);
     });
 }
 
 function createEvent(eventObj) {
+    // Validation on Event_.initialize
+    // On validation error throws a 400 status with a message and stack
     var newEvent = new Event_(eventObj);
     return newEvent.save(null, {method: 'insert'});
 }
 
 function updateEvent(eventId, updatedEventObj) {
     return bookshelf.transaction(function(trx) {
-        return Event_
-        .where({id: eventId})
-        .fetch()
-        .then(function(eventModel) {
+        return Event_.where({id: eventId}).fetch().then(function(eventModel) {
+            // Uses bookshelfs transaction as method option
             return eventModel.save(updatedEventObj, {transacting: trx})
         });
     });
@@ -177,10 +172,7 @@ function deleteEvent(eventId) {
     validate(eventId, 'id', modelUtils.schema.bigInteger().required());
 
     return bookshelf.transaction(function(trx) {
-        return Event_
-        .where({id: eventId})
-        .fetch()
-        .then(function(eventModel) {
+        return Event_.where({id: eventId}).fetch().then(function(eventModel) {
             if (!eventModel) {
                 var err = new Error('Event does not exist');
                 err.status = 404;
@@ -189,15 +181,6 @@ function deleteEvent(eventId) {
 
             return [eventModel.destroy(), eventModel.toJSON()];
         });
-        /*
-        .spread(function(destroyValue, deletedEventObj) {
-            serviceUtils.deleteFromRedis(
-                CONST.REDIS_PREFIX.EVENT_SUMMARIES,
-                deletedEventObj.target.namespace,
-                deletedEventObj.,
-            );
-        });
-        */
     });
 }
 
@@ -220,6 +203,7 @@ function omitModeratorFields(publicEventObj) {
 module.exports = {
     getEvents: getEvents,
     getEvent: getEvent,
+    //getEventDistances: getEventDistances,
     createEvent: createEvent,
     updateEvent: updateEvent,
     deleteEvent: deleteEvent,

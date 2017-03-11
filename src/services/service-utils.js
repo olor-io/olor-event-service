@@ -158,19 +158,12 @@ function validateBoolean(val, name) {
     }
 }
 
-// Takes obj containing some keys which are allowed to use in where query
-// Take those keys, validate their values so that they match the given
-// Model's field validation.
-// Throws parameter error if validation does not pass, otherwise
-// returns the where query object, e.g.
-// {targetNamespace: 'a', targetId: ['a', 'b']}
-// If allowedKeys is not defined, all keys are accepted
-// `publicToModel` can be an object which defined which attributes belong to
-// which models. It can also be a single model which will be used with all keys
+// Validates obj keys by comparing each key with the passed allowedKeys.
+// Throws parameter error if validation does not pass, otherwise returns the
+// where query object
 function pickAndValidateWheres(obj, publicToModel, allowedKeys) {
     // Pick all keys which are allowed in the query
     var whereObj = _.pickBy(obj, function(val, key) {
-        logger.info('does this work inside here? ' + 'key: ' + key + ', val: ' + val);
         var isAllowed = _.isArray(allowedKeys)
             ? _.includes(allowedKeys, key)
             : true;
@@ -241,11 +234,7 @@ function addSortsToQuery(query, sorts, publicToModel) {
     return query;
 }
 
-// Add where queries to knex query builder object
-// wheres is e.g. {targetNamespace: 'recipe', targetId: ['a', 'b']}
-// the example would translate to
-// WHERE target_namespace = 'recipe' AND target_id IN ('a', 'b');
-// Modifies query object in place
+// Add where queries to knex query builder object and modifies query object in place
 function addWheresToQuery(query, wheres, publicToModel) {
     _.each(wheres, function(value, modelAttr) {
         var column = modelAttr;

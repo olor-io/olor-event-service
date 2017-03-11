@@ -41,9 +41,6 @@ function objectKeysToCase(obj, toCase) {
 }
 
 // bookshelf needs to be initialized before basic Model can be extended
-// The API is a bit weird, but that's how bookshelf works(for the time being)
-// NOTE: If you override these predefined methods, remember to call these
-// original functions too
 // See: http://bookshelfjs.org/#Model-extend
 function createBaseModel(bookshelf) {
     var BaseModel = bookshelf.Model.extend({

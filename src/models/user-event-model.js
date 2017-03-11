@@ -17,7 +17,7 @@ var UserEvent = BaseModel.extend({
     },
 
     events: function() {
-        return this.belongsTo('Event');
+        return this.belongsTo('Event_');
     },
 
     users: function() {

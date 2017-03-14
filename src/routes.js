@@ -26,6 +26,13 @@ function createRouter() {
     });
 
     createRoute(router, {
+        method: 'get',
+        url: '/distances',
+        roles: CONST.USER_ROLE_GROUPS.ALL,
+        callback: eventController.getEventDistances
+    });
+
+    createRoute(router, {
         method: 'post',
         url: '/events',
         roles: CONST.USER_ROLE_GROUPS.ALL,

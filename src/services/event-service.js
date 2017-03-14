@@ -3,6 +3,7 @@
 var CONST = require('../constants');
 var Event_ = require('../models/event-model');
 var UserEvent = require('../models/user-event-model');
+var EventDistance = require('../models/event-distance-model');
 var modelUtils = require('../models/model-utils');
 var serviceUtils = require('./service-utils');
 
@@ -34,12 +35,14 @@ var PUBLIC_TO_MODEL = {
     adminId: {model: Event_, attribute: 'adminId'},
     reviewDeadline: {model: Event_, attribute: 'reviewDeadline'},
     createdAt: {model: Event_, attribute: 'createdAt'},
-    updatedAt: {model: Event_, attribute: 'updatedAt'}
+    updatedAt: {model: Event_, attribute: 'updatedAt'},
+    participants: {model: Event_, attribute: 'participants'}
 };
 
 // Based on these columns, events can be searched so that
 // the value is single value or array of values.
 var ALLOWED_MULTI_SEARCH_KEYS = [
+    'id',
     'userId',
     'eventId',
     'categoryId',
@@ -47,6 +50,7 @@ var ALLOWED_MULTI_SEARCH_KEYS = [
     'curParticipants',
     'lat',
     'long',
+    'participants',
     'creatorId',
     'adminId'
 ];
@@ -54,6 +58,7 @@ var ALLOWED_MULTI_SEARCH_KEYS = [
 // These should correspond to indexes in database
 // If you add new sortable columns, check indexes in database
 var ALLOWED_SORT_KEYS = [
+    'id',
     'userId',
     'eventId',
     'categoryId',
@@ -80,6 +85,7 @@ var SERVICE_USER_KEYS = [
     'curParticipants',
     'lat',
     'long',
+    'participants',
     'address',
     'creatorId',
     'adminId',
@@ -105,7 +111,35 @@ function getEvents(params, internalOpts) {
     );
 
     // Execute query
-    var queryBuilder = knex.select().from(EVENTS_TABLE);
+    var queryBuilder = knex
+    .select(
+      'events.id',
+      'events.name',
+      'events.description',
+      'events.start_time',
+      'events.duration',
+      'events.review_deadline',
+      'events.max_participants',
+      'events.cur_participants',
+      'events.creator_id',
+      'events.admin_id',
+      knex.raw('json_agg(' + USER_EVENTS_TABLE + '.user_id) as participants'),
+      'events.category_id',
+      'events.chat_id',
+      'events.lat',
+      'events.long',
+      'events.address',
+      'events.created_at',
+      'events.updated_at'
+    )
+    .from(EVENTS_TABLE + ' as ' + EVENTS_TABLE)
+    .leftJoin(
+          USER_EVENTS_TABLE + ' as ' + USER_EVENTS_TABLE,
+          EVENTS_TABLE + '.id',
+          USER_EVENTS_TABLE + '.event_id'
+    )
+    .groupBy(EVENTS_TABLE + '.id', USER_EVENTS_TABLE + '.event_id');
+
     var countQueryOpts = { trx: internalOpts.trx };
     var countQuery = serviceUtils.countQuery(queryBuilder, countQueryOpts);
 
@@ -152,12 +186,9 @@ function getEvent(eventId, internalOpts) {
     });
 }
 
-
-function getEventDistances(userCoordObj, internalOpts) {
+function getEventDistances(params, internalOpts) {
     // TODO:
-    //    Change coordinates to latitude and longitude for improved
-    //    validation, easier use and better coordination between services.
-    //    Cleanup and utility movements to service-utils.
+    //    Cleanup and utility to service-utils.
 
     internalOpts = _.merge({
         disableLimit: false,
@@ -166,10 +197,13 @@ function getEventDistances(userCoordObj, internalOpts) {
 
     var queryBuilder = knex.select([
         'id as id',
-        'coordinates as coordinates'
+        'name as name',
+        'lat as lat',
+        'long as long'
     ])
     .from(EVENTS_TABLE);
 
+    var opts = serviceUtils.pickAndValidateListOpts(params, ALLOWED_SORT_KEYS);
     var countQueryOpts = { trx: internalOpts.trx };
     var countQuery = serviceUtils.countQuery(queryBuilder, countQueryOpts);
 
@@ -184,26 +218,18 @@ function getEventDistances(userCoordObj, internalOpts) {
 
         return queryBuilder.then(function(rows) {
             var data = _.map(rows, function(row) {
-                var publicEventObj = Event_.prototype.parse(row);
-                var eventCoordObj = publicEventObj.coordinates.split(',');
-                eventCoordObj = _.zipObject(
-                  ['lat','long'],
-                  [eventCoordObj[0],eventCoordObj[1]]
-                );
+                var eventDistanceObj = EventDistance.prototype.parse(row);
+                eventDistanceObj.distance = geo.getDistance(
+                    {latitude: params.lat, longitude: params.long},
+                    {latitude: eventDistanceObj.lat, longitude: eventDistanceObj.long}
+                  );
 
-                // TODO:
-                //    Add distance var to Event_ model OR
-                //    create new model for utilities
-                publicEventObj.distance = geo.getDistance({
-                    [ userCoordObj.lat, userCoordObj.long ],
-                    [ eventCoordObj.lat, eventCoordObj.long ]
-                });
-
-                return formatEventSafe(publicObj, internalOpts);
+                return formatEventSafe(eventDistanceObj, internalOpts);
             });
 
             return {
-                // totalCount passed to x-total-count response header
+                // TODO:
+                //  Better and clearer JSON output
                 totalCount: totalCount,
                 data: data
             };
@@ -262,7 +288,7 @@ function omitModeratorFields(publicEventObj) {
 module.exports = {
     getEvents: getEvents,
     getEvent: getEvent,
-    //getEventDistances: getEventDistances,
+    getEventDistances: getEventDistances,
     createEvent: createEvent,
     updateEvent: updateEvent,
     deleteEvent: deleteEvent,

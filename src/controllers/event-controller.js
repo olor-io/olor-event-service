@@ -31,6 +31,8 @@ var getEvents = createJsonRoute(function getEvents(req, res) {
         params.sort = [controllerUtils.splitSortString(req.query.sort)];
     }
 
+    logger.info('operation=getEvents');
+    logger.info('headers: ' + JSON.stringify(req.headers));
     return eventService.getEvents(params, serviceOpts)
     .then(function(result) {
         res.setHeader(CONST.HEADER_TOTAL_COUNT, result.totalCount);
@@ -46,17 +48,17 @@ var getEvent = createJsonRoute(function getEvent(req, res) {
         serviceOpts.includeAllFields = true;
     }
     */
+    logger.info('operation=getEvent id=' + req.params.id);
+    logger.info('headers: ' + JSON.stringify(req.headers));
     return eventService.getEvent(req.params.id, serviceOpts);
 });
 
-/*
 var getEventDistances = createJsonRoute(function getEventDistances(req, res) {
     var serviceOpts = {};
-    serviceOpts.includeAllFields = true;
-
     var params = {
         id:              req.params.id,
-        coordinates:     req.query.coordinates,
+        lat:             req.query.lat,
+        long:            req.query.long,
         offset:          req.query.offset,
         limit:           req.query.limit
     };
@@ -67,14 +69,12 @@ var getEventDistances = createJsonRoute(function getEventDistances(req, res) {
         params.sort = [controllerUtils.splitSortString(req.query.sort)];
     }
 
-    return eventService.getEventDistances(params, internalOpts);
+    return eventService.getEventDistances(params, serviceOpts);
 });
-*/
 
 var postEvent = createJsonRoute(function postEvent(req, res) {
     var serviceOpts = {};
     var eventObj = {
-        //id:             req.body.id,
         name:             req.body.name,
         description:      req.body.description,
         startTime:        req.body.startTime,
@@ -90,12 +90,6 @@ var postEvent = createJsonRoute(function postEvent(req, res) {
         chatId:           req.body.chatId,
         categoryId:       req.body.categoryId
     };
-
-    var createdAt = new Date();
-    eventObj = _.merge({
-        createdAt: createdAt,
-        updatedAt: createdAt
-    }, eventObj);
 
     logger.info('operation=createEvent');
     logger.info('headers: ' + JSON.stringify(req.headers));
@@ -116,7 +110,7 @@ var putEvent = createJsonRoute(function putEvent(req, res) {
             throw err;
         }
         */
-        //var serviceOpts = {};
+
         var eventObj = {
             id:               req.body.id,
             name:             req.body.name,
@@ -136,11 +130,6 @@ var putEvent = createJsonRoute(function putEvent(req, res) {
             createdAt:        existingEvent.createdAt
         };
 
-        var updatedAt = new Date();
-        eventObj = _.merge({
-            updatedAt: updatedAt
-        }, eventObj);
-
         /*
         if (authService.isRoleAboveService(userRole)) {
             eventObj.published = req.body.published;
@@ -158,8 +147,6 @@ var putEvent = createJsonRoute(function putEvent(req, res) {
 
         logger.info('operation=updateEvent eventId=' + eventId);
         logger.info('headers: ' + JSON.stringify(req.headers));
-        logger.info('body: ' + JSON.stringify(eventObj));
-        //return eventService.updateEvent(eventId, eventObj);
         return eventService.updateEvent(eventId, eventObj);
     });
 });
@@ -204,8 +191,9 @@ function throwIfAuthorRoleNotAllowed(userRole, authorRole) {
 
 module.exports = {
     getEvents: getEvents,
-    postEvent: postEvent,
     getEvent: getEvent,
+    getEventDistances: getEventDistances,
+    postEvent: postEvent,
     putEvent: putEvent,
     deleteEvent: deleteEvent
 };

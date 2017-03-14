@@ -1,16 +1,16 @@
 {
-    "name": "Create-testi",
+    "name": "Turku-testi",
     "description": "Vitusti testiä",
-    "startTime": "1994-11-05T13:15:30Z",
+    "startTime": "2017-04-01T13:15:00Z",
     "duration": 6,
-    "maxParticipants": 600,
+    "maxParticipants": 6,
     "curParticipants": 1,
-    "lat": 47.376887,
-    "long": 178.541694,
-    "address": "Zurich, CH",
-    "creatorId": "8",
-    "adminId": "8",
-    "reviewDeadline": "1994-11-05T13:15:30Z",
+    "lat": 60.454510,
+    "long": 22.264824,
+    "address": "Turku, Suomi",
+    "creatorId": "c80854a85de4d8cc658e137cb7466b14",
+    "adminId": "c80854a85de4d8cc658e137cb7466b14",
+    "reviewDeadline": "2017-11-05T13:15:30Z",
     "chatId": 9,
-    "categoryId": 4
+    "categoryId": 5
 }

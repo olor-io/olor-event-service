@@ -14,9 +14,11 @@ var schema = {
     lat: Joi.number().precision(6).min(-90).max(90).required(),
     long: Joi.number().precision(6).min(-180).max(180).required(),
     address: Joi.string().max(500, 'utf8').optional(),
-    // coordinates: Joi.string().required(),
     creatorId: modelUtils.schema.stringId().required(),
     adminId: modelUtils.schema.stringId().required(),
+    participants: Joi.object().keys({
+        userId: modelUtils.schema.stringId().optional()
+    }),
     reviewDeadline: Joi.date().iso().required(),
     chatId: Joi.number().integer().required(),
     categoryId: Joi.number().integer().required()

@@ -1,6 +1,5 @@
 var events = [
     {
-        //id: 1,
         name: 'Jalkapallo @ Brahen kenttä',
         description: 'Vitusti jalkapalloa',
         startTime: new Date(2017, 3, 1, 13, 0, 0),
@@ -10,8 +9,8 @@ var events = [
         lat: 60.192059,
         long: 24.945831,
         address: "Helsinki",
-        creatorId: "1",
-        adminId: "1",
+        creatorId: "c88774a85uu2d3cc658e127cb3511b34",
+        adminId: "c88774a85uu2d3cc658e127cb3511b34",
         reviewDeadline: new Date(2017, 4, 1, 23, 59, 59),
         chatId: 1,
         categoryId: 1,
@@ -19,7 +18,6 @@ var events = [
         updatedAt: new Date()
     },
     {
-        //id: 2,
         name: 'Slush-afterparty',
         description: 'Pöhinöintiä ja ilmasta kaliaa',
         startTime: new Date(2017, 8, 12, 19, 0, 0),
@@ -29,8 +27,8 @@ var events = [
         lat: 60.192059,
         long: 24.945831,
         address: "Helsinki",
-        creatorId: "2",
-        adminId: "2",
+        creatorId: "c88774a85uu2d3cc658e127cb5422b34",
+        adminId: "c88774a85uu2d3cc658e127cb5422b34",
         reviewDeadline: new Date(2017, 9, 12),
         chatId: 2,
         categoryId: 4,
@@ -38,7 +36,6 @@ var events = [
         updatedAt: new Date()
     },
     {
-        //id: 3,
         name: 'Totally-Not-A-Date -bileet',
         description: 'Tää ei ole Tinder',
         startTime: new Date(2017, 2, 15),
@@ -48,8 +45,8 @@ var events = [
         lat: 60.192059,
         long: 24.945831,
         address: "Helsinki",
-        creatorId: "3",
-        adminId: "3",
+        creatorId: "c88774a85uu2d3cc658e127cb5433b34",
+        adminId: "c88774a85uu2d3cc658e127cb5433b34",
         reviewDeadline: new Date(2017, 3, 15),
         chatId: 3,
         categoryId: 3,
@@ -57,7 +54,6 @@ var events = [
         updatedAt: new Date()
     },
     {
-        //id: 4,
         name: 'Tinder-bileet',
         description: 'Täähän _ei siis ole_ Tinder',
         startTime: new Date(2017, 2, 15, 18, 0, 0),
@@ -67,8 +63,8 @@ var events = [
         lat: 60.192059,
         long: 24.945831,
         address: "Helsinki",
-        creatorId: "1",
-        adminId: "2",
+        creatorId: "c88774a85au2d9cc658e127cb5433b34",
+        adminId: "c80874a85au2d9cc658e137cb7433b34",
         reviewDeadline: new Date(2017, 3, 15),
         chatId: 4,
         categoryId: 4,
@@ -76,7 +72,6 @@ var events = [
         updatedAt: new Date()
     },
     {
-        //id: 5,
         name: 'Tornin avajaiset',
         description: 'Juhlitaan kovin hienosti. Much VIP, many important',
         startTime: new Date(2017, 2, 15, 22, 0, 0),
@@ -86,8 +81,8 @@ var events = [
         lat: 60.192059,
         long: 24.945831,
         address: "Helsinki",
-        creatorId: "3",
-        adminId: "3",
+        creatorId: "c80874a85au2d9cc658e137cb7433b34",
+        adminId: "c80874a85au2d9cc658e137cb7433b34",
         reviewDeadline: new Date(2017, 3, 15),
         chatId: 5,
         categoryId: 5,
@@ -105,8 +100,8 @@ var events = [
         lat: 60.192059,
         long: 24.945831,
         address: "Helsinki",
-        creatorId: "4",
-        adminId: "4",
+        creatorId: "c80874a85au2d9cc658e137cb7433b14",
+        adminId: "c80874a85au2d9cc658e137cb7433b14",
         reviewDeadline: new Date(2017, 3, 15),
         chatId: 6,
         categoryId: 6,
@@ -114,7 +109,6 @@ var events = [
         updatedAt: new Date()
     },
     {
-        //id: 7,
         name: 'Tekiksen kaatajaiset',
         description: '',
         startTime: new Date(2017, 2, 15, 18, 30, 0),
@@ -124,8 +118,8 @@ var events = [
         lat: 60.192059,
         long: 24.945831,
         address: "Helsinki",
-        creatorId: "7",
-        adminId: "7",
+        creatorId: "c80874a85de4d8cc658e137cb7433b14",
+        adminId: "c80874a85de4d8cc658e137cb7433b14",
         reviewDeadline: new Date(2017, 3, 15),
         chatId: 7,
         categoryId: 7,
@@ -133,7 +127,6 @@ var events = [
         updatedAt: new Date()
     },
     {
-        //id: 8,
         name: 'Bowlarama',
         description: 'Bowling w/ a purpose',
         startTime: new Date(2017, 2, 15, 17, 0, 0),
@@ -143,8 +136,8 @@ var events = [
         lat: 60.192059,
         long: 24.945831,
         address: "Helsinki",
-        creatorId: "8",
-        adminId: "8",
+        creatorId: "c80854a85de4d8cc658e137cb7466b14",
+        adminId: "c80854a85de4d8cc658e137cb7466b14",
         reviewDeadline: new Date(2017, 3, 15),
         chatId: 8,
         categoryId: 4,

@@ -6,7 +6,7 @@ exports.up = function(knex, Promise) {
     .createTableIfNotExists('user_events', function(table) {
         // Create user_events table
         table.increments('id').primary().index();
-        table.integer('user_id').notNullable().index();
+        table.string('user_id').notNullable().index();
         table.integer('event_id').notNullable().index();
         table.timestamp('created_at').index();
         table.timestamp('updated_at').index();

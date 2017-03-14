@@ -6,14 +6,9 @@ var CONST = require('../constants');
 
 var schema = {
     // Optional id, creation time and modification time are specified in base model on default
-    userId: modelUtils.schema.stringId().required(),
-    firstName: Joi.string().min(1, 'utf8').max(50, 'utf8').required(),
-    lastName: Joi.string().min(1, 'utf8').max(100, 'utf8').required(),
-    age: Joi.number().min(CONST.USER_MIN_AGE).max(CONST.USER_MAX_AGE).integer().required(),
-    bio: Joi.string().min(1, 'utf8').max(300, 'utf8').optional(),
-    pictureUrl: Joi.string().uri({scheme: ['http', 'https']}).min(1).max(2000).optional(),
-    eventDistanceArea: Joi.number().integer().required(),
-    karma: Joi.number().integer().required()
+    userId: modelUtils.schema.stringId().primary(),
+    lat: Joi.number().precision(6).min(-90).max(90).required(),
+    long: Joi.number().precision(6).min(-180).max(180).required()
 };
 
 var User = BaseModel.extend({

@@ -5,7 +5,8 @@ var BaseModel = modelUtils.createBaseModel(bookshelf);
 var schema = {
     // Id, creation time and modification time are specified in base model on default
     userId: modelUtils.schema.stringId().required(),
-    eventId: modelUtils.schema.stringId().required()
+    eventId: modelUtils.schema.stringId().required(),
+    distance: Joi.number().integer().required()
 };
 
 var UserEvent = BaseModel.extend({

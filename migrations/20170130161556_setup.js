@@ -8,6 +8,7 @@ exports.up = function(knex, Promise) {
         table.increments('id').primary().index();
         table.string('user_id').notNullable().index();
         table.integer('event_id').notNullable().index();
+        table.integer('distance').index();
         table.timestamp('created_at').index();
         table.timestamp('updated_at').index();
     })

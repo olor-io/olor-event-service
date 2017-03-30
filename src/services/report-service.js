@@ -1,4 +1,4 @@
-// Service to handle all operations related to events
+// Service to handle all operations related to event-specific reports
 
 var CONST = require('../constants');
 var Event_ = require('../models/event-model');
@@ -130,10 +130,10 @@ function getEventDistances(params, internalOpts) {
             var userEventObj = UserEvent.prototype.parse(row);
 
             // Gets distance from user to each events in meters
-            // Accuracy is set to 10 (1250 meters)
+            // Accuracy is set to 1 (distinct meters)
             userEventObj.distance = geo.getDistance(
                 {latitude: params.lat, longitude: params.long},
-                {latitude: userEventObj.lat, longitude: userEventObj.long} , 10);
+                {latitude: userEventObj.lat, longitude: userEventObj.long} , 1);
 
             return formatEventSafe(userEventObj, internalOpts);
         });

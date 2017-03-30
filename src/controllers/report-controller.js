@@ -15,6 +15,7 @@ var getEventDistances = createJsonRoute(function getEventDistances(req, res) {
     };
 
     var serviceOpts = {};
+    serviceOpts.includeAllFields = false;
 
     if (_.isArray(req.query.sort)) {
         params.sort = _.map(req.query.sort, controllerUtils.splitSortString);

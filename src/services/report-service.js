@@ -27,9 +27,10 @@ var PUBLIC_TO_MODEL = {
     userId: {model: UserEvent, attribute: 'userId'},
     eventId: {model: UserEvent, attribute: 'eventId'},
     distance: {model: UserEvent, attribute: 'distance'},
+    descriptionLength: {model: UserEvent, attribute: 'descriptionLength'},
+    capacityLeft: {model: UserEvent, attribute: 'capacityLeft'},
 
     // Event_
-
     categoryId: {model: Event_, attribute: 'categoryId'},
     chatId: {model: Event_, attribute: 'chat'},
     name: {model: Event_, attribute: 'name'},
@@ -60,6 +61,9 @@ var ALLOWED_MULTI_SEARCH_KEYS = [
     'curParticipants',
     'lat',
     'long',
+    'descriptionLength',
+    'capacityLeft',
+    'distance',
     'participants',
     'creatorId',
     'adminId',
@@ -93,6 +97,7 @@ var SERVICE_USER_KEYS = [
     'adminId',
     'descriptionLength',
     'capacityLeft',
+    'distance',
     'startTime',
     'createdAt',
     'updatedAt'
@@ -109,14 +114,14 @@ function getEventDistances(params, internalOpts) {
     }, internalOpts);
 
     var queryBuilder = knex.select(
-        'id as id',
+        'id as eventId',
         'category_id as categoryId',
         'lat as lat',
         'long as long',
         'creator_id as creatorId',
         'admin_id as adminId',
-        knex.raw('character_length(description) as descriptionLength'),
-        knex.raw('cast((100.0 * cur_participants / max_participants) * 100.0 as integer) as capacityLeft'),
+        knex.raw('character_length(description) as "descriptionLength"'),
+        knex.raw('cast((100.0 * cur_participants / max_participants) * 100.0 as integer) as "capacityLeft"'),
         'start_time as startTime',
         'created_at as createdAt',
         'updated_at as updatedAt'

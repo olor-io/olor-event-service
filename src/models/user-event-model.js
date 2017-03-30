@@ -7,7 +7,9 @@ var schema = {
     // Id, creation time and modification time are specified in base model on default
     userId: modelUtils.schema.stringId().required(),
     eventId: modelUtils.schema.stringId().required(),
-    distance: Joi.number().integer().required()
+    distance: Joi.number().integer().required(),
+    descriptionLength: Joi.number().integer(),
+    capacityLeft: Joi.number().integer()
 };
 
 var UserEvent = BaseModel.extend({

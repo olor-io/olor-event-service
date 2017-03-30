@@ -1,5 +1,6 @@
 var express = require('express');
 var eventController = require('./controllers/event-controller');
+var reportController = require('./controllers/report-controller');
 var CONST = require('./constants');
 //var passport = require('passport');
 //var authService = require('./services/auth-service');
@@ -9,7 +10,7 @@ var CONST = require('./constants');
 function createRouter() {
     var router = express.Router();
 
-    // List of events
+    // Events
     createRoute(router, {
         method: 'get',
         url: '/events',
@@ -17,19 +18,11 @@ function createRouter() {
         callback: eventController.getEvents
     });
 
-    // Event
     createRoute(router, {
         method: 'get',
         url: '/events/:id',
         roles: CONST.USER_ROLE_GROUPS.ALL,
         callback: eventController.getEvent
-    });
-
-    createRoute(router, {
-        method: 'get',
-        url: '/distances',
-        roles: CONST.USER_ROLE_GROUPS.ALL,
-        callback: eventController.getEventDistances
     });
 
     createRoute(router, {
@@ -51,6 +44,14 @@ function createRouter() {
         url: '/events/:id',
         roles: CONST.USER_ROLE_GROUPS.ALL,
         callback: eventController.deleteEvent
+    });
+
+    // Utility
+    createRoute(router, {
+        method: 'get',
+        url: '/reports/distances',
+        roles: CONST.USER_ROLE_GROUPS.ABOVE_MODERATOR,
+        callback: reportController.getEventDistances
     });
 
     return router;

@@ -113,30 +113,14 @@ function getEvents(params, internalOpts) {
     // Execute query
     var queryBuilder = knex
     .select(
-      'events.id',
-      'events.name',
-      'events.description',
-      'events.start_time',
-      'events.duration',
-      'events.review_deadline',
-      'events.max_participants',
-      'events.cur_participants',
-      'events.creator_id',
-      'events.admin_id',
-      knex.raw('json_agg(' + USER_EVENTS_TABLE + '.user_id) as participants'),
-      'events.category_id',
-      'events.chat_id',
-      'events.lat',
-      'events.long',
-      'events.address',
-      'events.created_at',
-      'events.updated_at'
+        EVENTS_TABLE + '.*',
+        knex.raw('json_agg(' + USER_EVENTS_TABLE + '.user_id) as participants')
     )
     .from(EVENTS_TABLE + ' as ' + EVENTS_TABLE)
     .leftJoin(
-          USER_EVENTS_TABLE + ' as ' + USER_EVENTS_TABLE,
-          EVENTS_TABLE + '.id',
-          USER_EVENTS_TABLE + '.event_id'
+        USER_EVENTS_TABLE + ' as ' + USER_EVENTS_TABLE,
+        EVENTS_TABLE + '.id',
+        USER_EVENTS_TABLE + '.event_id'
     )
     .groupBy(EVENTS_TABLE + '.id', USER_EVENTS_TABLE + '.event_id');
 
@@ -176,64 +160,23 @@ function getEvent(eventId, internalOpts) {
         includeAllFields: true
     }, internalOpts);
 
-    return Event_.where({id: eventId}).fetch().then(function(model) {
-        if (!model) {
-            var err = new Error('Event does not exist');
-            err.status = 404;
-            throw err;
-        }
-        return formatEventSafe(model.toJSON(), internalOpts);
-    });
-}
+    var queryBuilder = knex
+    .first(
+        EVENTS_TABLE + '.*',
+        knex.raw('json_agg(' + USER_EVENTS_TABLE + '.user_id) as participants')
+    )
+    .from(EVENTS_TABLE + ' as ' + EVENTS_TABLE)
+    .where(EVENTS_TABLE + '.id', eventId)
+    .leftJoin(
+        USER_EVENTS_TABLE + ' as ' + USER_EVENTS_TABLE,
+        EVENTS_TABLE + '.id',
+        USER_EVENTS_TABLE + '.event_id'
+    )
+    .groupBy(EVENTS_TABLE + '.id', USER_EVENTS_TABLE + '.event_id');
 
-function getEventDistances(params, internalOpts) {
-    // TODO:
-    //    Cleanup and utility to service-utils.
-
-    internalOpts = _.merge({
-        disableLimit: false,
-        includeAllFields: true
-    }, internalOpts);
-
-    var queryBuilder = knex.select([
-        'id as id',
-        'name as name',
-        'lat as lat',
-        'long as long'
-    ])
-    .from(EVENTS_TABLE);
-
-    var opts = serviceUtils.pickAndValidateListOpts(params, ALLOWED_SORT_KEYS);
-    var countQueryOpts = { trx: internalOpts.trx };
-    var countQuery = serviceUtils.countQuery(queryBuilder, countQueryOpts);
-
-    if (!internalOpts.disableLimit)
-        queryBuilder = queryBuilder.limit(opts.limit);
-
-    queryBuilder = queryBuilder.offset(opts.offset);
-    serviceUtils.addSortsToQuery(queryBuilder, opts.sort, PUBLIC_TO_MODEL);
-
-    return countQuery.then(function(res) {
-        var totalCount = Number(res[0].count);
-
-        return queryBuilder.then(function(rows) {
-            var data = _.map(rows, function(row) {
-                var eventDistanceObj = EventDistance.prototype.parse(row);
-                eventDistanceObj.distance = geo.getDistance(
-                    {latitude: params.lat, longitude: params.long},
-                    {latitude: eventDistanceObj.lat, longitude: eventDistanceObj.long}
-                  );
-
-                return formatEventSafe(eventDistanceObj, internalOpts);
-            });
-
-            return {
-                // TODO:
-                //  Better and clearer JSON output
-                totalCount: totalCount,
-                data: data
-            };
-        });
+    return queryBuilder.then(function(obj) {
+        var publicEventObj = Event_.prototype.parse(obj);
+        return formatEventSafe(publicEventObj, internalOpts);
     });
 }
 
@@ -288,7 +231,6 @@ function omitModeratorFields(publicEventObj) {
 module.exports = {
     getEvents: getEvents,
     getEvent: getEvent,
-    getEventDistances: getEventDistances,
     createEvent: createEvent,
     updateEvent: updateEvent,
     deleteEvent: deleteEvent,

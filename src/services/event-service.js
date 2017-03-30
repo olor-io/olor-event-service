@@ -3,7 +3,6 @@
 var CONST = require('../constants');
 var Event_ = require('../models/event-model');
 var UserEvent = require('../models/user-event-model');
-var EventDistance = require('../models/event-distance-model');
 var modelUtils = require('../models/model-utils');
 var serviceUtils = require('./service-utils');
 

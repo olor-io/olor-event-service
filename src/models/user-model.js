@@ -6,7 +6,7 @@ var CONST = require('../constants');
 
 var schema = {
     // Optional id, creation time and modification time are specified in base model on default
-    userId: modelUtils.schema.stringId().primary(),
+    userId: modelUtils.schema.stringId().required(),
     lat: Joi.number().precision(6).min(-90).max(90).required(),
     long: Joi.number().precision(6).min(-180).max(180).required()
 };

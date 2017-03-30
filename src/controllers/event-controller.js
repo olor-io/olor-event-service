@@ -4,7 +4,6 @@ var _ = require('lodash');
 var eventService = require('../services/event-service');
 var controllerUtils = require('./controller-utils');
 var createJsonRoute = controllerUtils.createJsonRoute;
-// var Event_ = require('../models/event-model');
 // var validate = require('../services/service-utils').validate;
 // var authService = require('../services/auth-service');
 // var FORBIDDEN_MESSAGE = 'Forbidden. Author is not allowed to do the operation.';
@@ -51,25 +50,6 @@ var getEvent = createJsonRoute(function getEvent(req, res) {
     logger.info('operation=getEvent id=' + req.params.id);
     logger.info('headers: ' + JSON.stringify(req.headers));
     return eventService.getEvent(req.params.id, serviceOpts);
-});
-
-var getEventDistances = createJsonRoute(function getEventDistances(req, res) {
-    var serviceOpts = {};
-    var params = {
-        id:              req.params.id,
-        lat:             req.query.lat,
-        long:            req.query.long,
-        offset:          req.query.offset,
-        limit:           req.query.limit
-    };
-
-    if (_.isArray(req.query.sort)) {
-        params.sort = _.map(req.query.sort, controllerUtils.splitSortString);
-    } else if (_.isString(req.query.sort)) {
-        params.sort = [controllerUtils.splitSortString(req.query.sort)];
-    }
-
-    return eventService.getEventDistances(params, serviceOpts);
 });
 
 var postEvent = createJsonRoute(function postEvent(req, res) {
@@ -192,7 +172,6 @@ function throwIfAuthorRoleNotAllowed(userRole, authorRole) {
 module.exports = {
     getEvents: getEvents,
     getEvent: getEvent,
-    getEventDistances: getEventDistances,
     postEvent: postEvent,
     putEvent: putEvent,
     deleteEvent: deleteEvent

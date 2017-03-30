@@ -218,6 +218,22 @@ function pickAndValidateListOpts(obj, allowedSortKeys, serviceDefaults) {
     return opts;
 }
 
+// Add an offset and limit to JSON data already returned from knex query
+// Returns modified JSON object
+function addLimitAndOffsetToJsonData(data, offset, limit) {
+    return data.slice(offset, limit);
+}
+
+// Add array of sorts to JSON data already returned form knex query
+// Returns modified JSON object
+function addSortsToJsonData(data, sorts) {
+    _.each(sorts, function(sortCriteria) {
+        var sortOrder = (sortCriteria.length > 1) ? sortCriteria[1] : 'asc';
+        data = _.orderBy(data, sortCriteria[0], sortOrder);
+    });
+    return data;
+}
+
 // Add array of sorts to knex query builder object
 // sorts is e.g. [['updatedAt', 'desc'], ['rating']]
 // Modifies query object in place
@@ -321,6 +337,8 @@ module.exports = {
     pickAndValidateWheres: pickAndValidateWheres,
     pickAndValidateListOpts: pickAndValidateListOpts,
     addSortsToQuery: addSortsToQuery,
+    addLimitAndOffsetToJsonData: addLimitAndOffsetToJsonData,
+    addSortsToJsonData: addSortsToJsonData,
     addWheresToQuery: addWheresToQuery,
     addWhereNotsToQuery: addWhereNotsToQuery,
     countQuery: countQuery

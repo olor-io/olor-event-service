@@ -4,10 +4,12 @@ var _ = require('lodash');
 var eventService = require('../services/report-service');
 var controllerUtils = require('./controller-utils');
 var createJsonRoute = controllerUtils.createJsonRoute;
+var validate = require('../services/service-utils').validate;
+var authService = require('../services/auth-service');
+var FORBIDDEN_MESSAGE = 'Forbidden. Author is not allowed to do the operation.';
 
 var getEventDistances = createJsonRoute(function getEventDistances(req, res) {
     var params = {
-        id:              req.params.id,
         lat:             req.query.lat,
         long:            req.query.long,
         offset:          req.query.offset,
@@ -15,7 +17,6 @@ var getEventDistances = createJsonRoute(function getEventDistances(req, res) {
     };
 
     var serviceOpts = {};
-    serviceOpts.includeAllFields = false;
 
     if (_.isArray(req.query.sort)) {
         params.sort = _.map(req.query.sort, controllerUtils.splitSortString);

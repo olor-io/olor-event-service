@@ -121,7 +121,7 @@ function getEventDistances(params, internalOpts) {
         'creator_id as creatorId',
         'admin_id as adminId',
         knex.raw('character_length(description) as "descriptionLength"'),
-        knex.raw('cast((100.0 * cur_participants / max_participants) * 100.0 as integer) as "capacityLeft"'),
+        knex.raw('cast((100.0 - (100.0 * cur_participants / max_participants)) * 100.0 as integer) as "capacityLeft"'),
         'start_time as startTime',
         'created_at as createdAt',
         'updated_at as updatedAt'

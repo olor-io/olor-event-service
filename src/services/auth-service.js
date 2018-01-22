@@ -2,7 +2,7 @@ var passport = require('passport');
 var Promise = require('bluebird');
 var _ = require('lodash');
 var bcrypt = Promise.promisifyAll(require('bcrypt'));
-var userService = require('./user-service');
+// var userService = require('./user-service');
 var CONST = require('../constants');
 var logger = require('../logger')(__filename);
 
@@ -73,7 +73,7 @@ function checkUserCredentials(username, password) {
     if (!username || !password) {
         Promise.resolve(false);
     }
-
+/*
     return userService.getUserByUsername(username, {includePassword: true})
     .then(function(user) {
         if (!user) {
@@ -95,7 +95,8 @@ function checkUserCredentials(username, password) {
         logger.error('Error when checking validity of user credentials:');
         logger.error(err);
         return false;
-    });
+    });*/
+    return false;
 }
 
 function createPasswordHash(password) {
